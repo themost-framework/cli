@@ -1,0 +1,64 @@
+{
+  "name": "classic-server-project",
+  "version": "0.1.0",
+  "description": "Sample Web Application",
+  "main": "dist/server/server.js",
+  "repository": "",
+  "private": true,
+  "author": "",
+  "scripts": {
+    "start": "node bin/www.js",
+    "clean": "rimraf dist/server",
+    "test": "jasmine",
+    "build": "themost build",
+    "themost": "themost",
+    "serve": "nodemon bin/www.js",
+    "debug": "nodemon --inspect-brk bin/www.js"
+  },
+  "devDependencies": {
+    "@themost-devkit/build-typescript": "^0.1.4",
+    "@themost/cli": "^2.5.0",
+    "@types/angular": "^1.6.57",
+    "@types/jasmine": "^3.5.12",
+    "@types/node": "^10.5.0",
+    "@types/superagent": "^4.1.9",
+    "@types/supertest": "^2.0.10",
+    "dotenv": "^8.2.0",
+    "jasmine": "^3.6.1",
+    "jasmine-spec-reporter": "^5.0.2",
+    "nodemon": "^1.19.0",
+    "rimraf": "^2.6.3",
+    "supertest": "^4.0.2",
+    "ts-node": "^7.0.0",
+    "tslint": "^5.14.0",
+    "typescript": "^3.9.7"
+  },
+  "dependencies": {
+    "@themost/client": "^2.5.1",
+    "@themost/common": "^2.5.2",
+    "@themost/data": "^2.5.7",
+    "@themost/node": "^2.5.0",
+    "@themost/query": "^2.5.0",
+    "@themost/sqlite": "^2.2.3",
+    "@themost/web": "^2.5.2",
+    "@themost/xml": "^2.5.1",
+    "bootstrap": "^4.1.1",
+    "jquery": "^3.3.1",
+    "popper.js": "^1.14.7"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "server/",
+      "./bin/www.js"
+    ],
+    "verbose": true,
+    "execMap": {
+      "js": "node --require ts-node/register"
+    },
+    "env": {
+      "NODE_ENV": "development",
+      "IP": "0.0.0.0"
+    },
+    "ext": "ts,js,json"
+  }
+}

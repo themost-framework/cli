@@ -1,0 +1,38 @@
+{
+    "$schema": "https://themost-framework.github.io/themost/models/2018/2/schema.json",
+    "@id": "https://themost.io/schemas/<%-name%>",
+    "name": "<%-name%>",
+    "title": "<%-title%>",
+    "version": "1.0",
+<% if (locals.inherits) {%>
+    "inherits": "<%-locals.inherits%>",
+<%}%>
+<% if (locals.implements) {%>
+    "implements": "<%-locals.implements%>",
+<%}%>
+    "fields": [
+        {
+            "@id": "https://themost.io/schemas/id",
+            "name": "id",
+            "title": "ID",
+            "description": "The identifier of the item.",
+            "type": "Counter",
+            "primary": true
+        }
+    ],
+    "constraints": [
+    ],
+    "eventListeners": [
+    ],
+    "privileges":[
+        {
+            "mask": 15,
+            "type": "global"
+        },
+        {
+            "mask": 15,
+            "type": "global",
+            "account": "Administrators"
+        }
+    ]
+}

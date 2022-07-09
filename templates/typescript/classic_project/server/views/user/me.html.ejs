@@ -1,0 +1,16 @@
+<% layout('../shared/master') %>
+<div class="container">
+    <div class="row mt-4">
+        <div class="offset-lg-4 col-lg-4">
+            <div class="card">
+              <div style="height: 192px" class="card-img-top bg-secondary"></div>
+              <div class="card-body">
+                <h5 class="card-title">Hello <%=model.name%></h5>
+                <p class="card-text"><%=model.description%></p>
+                <p class="small">Created at <%=html.moment(model.dateCreated).format('LLL')%></p>
+                <a href="#" class="btn btn-primary">Details</a>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>

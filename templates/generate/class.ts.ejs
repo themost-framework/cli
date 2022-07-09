@@ -1,0 +1,20 @@
+import {EdmMapping,EdmType} from '@themost/data/odata';
+<% locals.imports.forEach(function(x) { if (x.name==='{DataObject}') { %>
+import <%=x.name%> from '<%=x.from%>';<% } else { %>import <%=x.name%> = require('<%=x.from%>');
+<%}}) %>
+/**
+ * @class
+ */
+@EdmMapping.entityType('<%-name%>')
+class <%-name%> extends <%-inherits ? inherits : "DataObject"%> {
+<% locals.attributes.filter(function(x) { return x.model === name; }).forEach(function(x) { %>
+    public <%-x.property || x.name%><%-x.nullable ? '?' : ''%>: <%-x.typeName%>; <% }) %>
+    /**
+     * @constructor
+     */
+    constructor() {
+        super();
+    }
+}
+
+export = <%-name%>;
