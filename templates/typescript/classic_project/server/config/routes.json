@@ -1,0 +1,16 @@
+[
+    {
+        "url": "/?",
+        "controller": "root",
+        "action": "index",
+        "format": "html"
+    },
+    {
+        "url": "/{controller:plural}/?",
+        "action": "index"
+    },
+    {
+        "url": "/{controller:plural}/:action/?"
+    }
+
+]

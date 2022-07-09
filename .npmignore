@@ -1,0 +1,15 @@
+node_modules
+# ide
+.idea
+.vscode
+.theia
+.gitpod.yml
+
+# github
+.github
+
+# tests
+spec
+
+# elsint
+.eslintrc

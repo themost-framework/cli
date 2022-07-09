@@ -1,0 +1,5 @@
+{
+    "mode": "typescript",
+    "base":"server",
+    "out": "dist/server"
+}

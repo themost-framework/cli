@@ -1,0 +1,11 @@
+[
+    {
+        "url": "/?",
+        "controller": "root",
+        "action": "index"
+    },
+    {
+        "url": "/:action",
+        "controller": "root"
+    }
+]
