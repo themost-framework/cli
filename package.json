@@ -1,7 +1,7 @@
 {
   "name": "@themost/cli",
   "version": "2.5.7",
-  "description": "Most Web Framework command line utility",
+  "description": "CLI Tool for MOST Web Framework",
   "homepage": "https://github.com/themost-framework/cli",
   "repository": {
     "type": "git",

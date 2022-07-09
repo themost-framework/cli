@@ -1,9 +1,9 @@
-most-web-cli
+@themost/cli
 ============
 
-![MOST Web Framework Logo](https://www.themost.io/assets/images/most_logo_sw_240.png)
+![MOST Web Framework Logo](https://github.com/themost-framework/common/raw/master/docs/img/themost_framework_v3_128.png)
 
-A command line utility for [Most Web Framework](https://github.com/themost-framework/themost) applications.
+A command line utility for [Most Web Framework](https://github.com/themost-framework/) applications.
 
 Usage
 =====
