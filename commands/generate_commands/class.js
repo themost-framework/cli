@@ -79,7 +79,7 @@ function generateClass(argv, ignoreOther) {
                 model.inherits = model.inherits || null; 
                 model.imports = [];
                 if (model.inherits) {
-                    model.inheritsClassPath = "./".concat(_.dasherize(model.inherits).concat('-model'));
+                    model.inheritsClassPath = "./".concat(model.inherits);
                     model.imports.push({
                       "name": model.inherits,
                       "from": model.inheritsClassPath
@@ -88,7 +88,7 @@ function generateClass(argv, ignoreOther) {
                 else {
                     model.imports.push({
                       "name": "{DataObject}",
-                      "from": "@themost/data/data-object"
+                      "from": "@themost/data"
                     });
                 }
                 model.attributes.forEach((x)=> {
@@ -122,7 +122,7 @@ function generateClass(argv, ignoreOther) {
                     x.typeName = x.many ?  "Array<" + x.type + ">" : x.type;
                 });
                 //get file name
-                let destFile = _.dasherize(argv.name).concat('-model').concat(options.mode==='typescript' ? '.ts': '.js');
+                let destFile = argv.name.concat(options.mode === 'typescript' ? '.ts': '.js');
                 console.log('INFO', `Generating class ${destFile}`);
                 let destPath = path.resolve(process.cwd(), options.base, `models/${destFile}`);
                 console.log('INFO', `Validating class path ${destPath}`);

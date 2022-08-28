@@ -1,10 +1,8 @@
-import {EdmMapping,EdmType} from '@themost/data/odata';
+import {EdmMapping,EdmType} from '@themost/data';
 <% locals.imports.forEach(function(x) { if (x.name==='{DataObject}') { %>
-import <%=x.name%> from '<%=x.from%>';<% } else { %>import <%=x.name%> = require('<%=x.from%>');
+import {DataObject} from '@themost/data';<% } else { %>import {<%=x.name%>} from '<%=x.from%>';
 <%}}) %>
-/**
- * @class
- */
+
 declare class <%=locals.name%> extends <%=locals.inherits ? locals.inherits : "DataObject" %> {
 <% locals.attributes.filter(function(x) { return x.model === name; }).forEach(function(x) { %>
      <% if (x.description) { %>
@@ -12,7 +10,8 @@ declare class <%=locals.name%> extends <%=locals.inherits ? locals.inherits : "D
       * @description <%-x.description%>
       */<%}%>
      public <%-x.property || x.name%><%-x.nullable ? '?' : ''%>: <%-x.typeName%>; <% }) %>
-
 }
 
-export = <%=locals.name%>;
+export {
+     <%=locals.name%>
+}

@@ -1,12 +1,28 @@
 import {DataEventArgs} from '@themost/data';
 
+async function beforeSaveAsync(event: DataEventArgs) {
+   //
+}
+
+async function afterSaveAsync(event: DataEventArgs) {
+   //
+}
+
 // noinspection JSUnusedGlobalSymbols
 export function beforeSave(event: DataEventArgs, callback: (err?: Error) => void) {
-return callback();
+    return beforeSaveAsync(event).then(() => {
+        return callback();
+    }).catch((err) => {
+        return callback(err);
+    });
 }
 
 // noinspection JSUnusedGlobalSymbols
 export function afterSave(event: DataEventArgs, callback: (err?: Error) => void) {
-return callback();
+    return afterSaveAsync(event).then(() => {
+        return callback();
+    }).catch((err) => {
+        return callback(err);
+    });
 }
 

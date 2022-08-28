@@ -1,9 +1,28 @@
+
+/**
+* @param {DataEventArgs} event
+*/
+async function beforeSaveAsync(event) {
+   //
+}
+
+/**
+* @param {DataEventArgs} event
+*/
+async function afterSaveAsync(event) {
+   //
+}
+
 /**
  * @param {DataEventArgs} event
  * @param {Function} callback
  */
 export function beforeSave(event, callback) {
-    return callback();
+    return beforeSaveAsync(event).then(() => {
+        return callback();
+    }).catch((err) => {
+        return callback(err);
+    });
 }
 
 /**
@@ -11,5 +30,9 @@ export function beforeSave(event, callback) {
  * @param {Function} callback
  */
 export function afterSave(event, callback) {
-    return callback();
+    return afterSaveAsync(event).then(() => {
+        return callback();
+    }).catch((err) => {
+        return callback(err);
+    });
 }
