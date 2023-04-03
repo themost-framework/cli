@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "@themost/xml": "^2.5.1",
-    "@xmldom/xmldom": "^0.8.1",
+    "@xmldom/xmldom": "^0.8.7",
     "async": "^2.6.0",
     "easy-table": "^1.1.1",
     "ejs": "^3.1.6",
