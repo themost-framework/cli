@@ -179,6 +179,19 @@ module.exports.getBuilder = function getBuilder(config) {
 module.exports.getHttpApplication = function getHttpApplication(options) {
     let HttpApplication;
     let appModule;
+    if (options.application) {
+        // try to create application from custom module
+        let [customModule, className] = options.application.split('#');
+        if (className) {
+            const ApplicationClass = require(customModule)[className];
+            // create a new instance of application passing the output directory as the current path
+            return new ApplicationClass(path.resolve(process.cwd(), options.out));
+        }
+        if (typeof customModule !== 'function') {
+            throw new Error(`Invalid application module. The module ${options.application} does not export a function.`);
+        }
+        return customModule(path.resolve(process.cwd(), options.out));
+    }
     try {
         appModule = require.resolve('@themost/web',{
             paths:[path.resolve(process.cwd(), 'node_modules')]
