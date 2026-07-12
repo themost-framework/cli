@@ -1,6 +1,6 @@
 // MOST Web Framework Copyright (c) 2017-2022, THEMOST LP All rights reserved
 const getConfiguration = require('../util').getConfiguration;
-const getHttpApplication = require('../util').getHttpApplication;
+const getApplication = require('../util').getApplication;
 const fs = require('fs-extra');
 const path = require('path');
 
@@ -13,10 +13,10 @@ module.exports.desc = 'Query data';
 module.exports.builder = function builder(yargs) {
     return yargs.option('model', {
         describe:'the target model'
-    }).option('dev', {
-        default: false,
-        boolean: true,
-        describe: 'enables development mode'
+    }).option('configuration', {
+        alias:'c',
+        choices: ['development', 'production'],
+        default:'development'
     }).option('filter', {
         default: null,
         describe: 'defines query filter'
@@ -57,11 +57,14 @@ module.exports.handler = function handler(argv) {
         console.error('ERROR','The target cannot be empty');
         process.exit(1);
     }
-    if (argv.dev) {
+    if (argv.configuration === 'development') {
         //set development mode
         process.env.NODE_ENV='development';
     }
-    let app = getHttpApplication(options);
+    Object.assign(options, {
+        configuration: argv.configuration
+    });
+    let app = getApplication(options);
     app.execute((context)=> {
         try {
             let model = context.model(argv.model);

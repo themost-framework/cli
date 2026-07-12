@@ -180,7 +180,7 @@ module.exports.getBuilder = function getBuilder(config) {
     return new ODataConventionModelBuilder(config);
 };
 
-module.exports.getHttpApplication = function getHttpApplication(options) {
+module.exports.getApplication = function getApplication(options) {
     let HttpApplication;
     let appModule;
     if (options.application) {
