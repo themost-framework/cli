@@ -30,6 +30,11 @@
   "scripts": {
     "cli": "node bin/themost"
   },
+  "peerDependencies": {
+    "@themost/data": "^2",
+    "@themost/common": "^2",
+    "@themost/express": "^1 || ^2"
+  },
   "dependencies": {
     "@themost/xml": "^2.5.1",
     "@xmldom/xmldom": "^0.9.10",

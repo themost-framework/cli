@@ -105,10 +105,11 @@ module.exports.getConfiguration = getConfiguration;
     delete obj.classPath;
     //clear event listeners
     obj.eventListeners = [];
-    let dataModule = require.resolve('@themost/data/data-model',{
+    let dataModule = require.resolve('@themost/data',{
             paths:[path.resolve(process.cwd(), 'node_modules')]
         });
-    let DataModel = require(dataModule).DataModel,
+    // noinspection JSUnresolvedReference
+      let DataModel = require(dataModule).DataModel,
         model = new DataModel(obj);
     //set model context
     model.context = self;
@@ -126,6 +127,7 @@ module.exports.getDataConfiguration = function getDataConfiguration(options) {
         let dataModule = require.resolve('@themost/data/data-configuration',{
             paths:[path.resolve(process.cwd(), 'node_modules')]
         });
+        // noinspection JSUnresolvedReference
         DataConfiguration = require(dataModule).DataConfiguration;
     }
     catch(err) {
@@ -161,16 +163,18 @@ module.exports.getDataConfiguration = function getDataConfiguration(options) {
 
 module.exports.getBuilder = function getBuilder(config) {
     let ODataConventionModelBuilder;
-    let dataModule = require.resolve('@themost/data/odata',{
+    let dataModule = require.resolve('@themost/data',{
             paths:[path.resolve(process.cwd(), 'node_modules')]
         });
+    // noinspection JSUnresolvedReference
     ODataConventionModelBuilder = require(dataModule).ODataConventionModelBuilder;
     
-    let dataObjectModule = require.resolve('@themost/data/data-object',{
+    let dataObjectModule = require.resolve('@themost/data',{
             paths:[path.resolve(process.cwd(), 'node_modules')]
         });
     //disable data model class loader
     config.getStrategy(function ModelClassLoaderStrategy() {}).resolve = function(model) {
+        // noinspection JSUnresolvedReference
         return require(dataObjectModule).DataObject;
     };
     return new ODataConventionModelBuilder(config);
@@ -196,6 +200,7 @@ module.exports.getHttpApplication = function getHttpApplication(options) {
         appModule = require.resolve('@themost/web',{
             paths:[path.resolve(process.cwd(), 'node_modules')]
         });
+        // noinspection JSUnresolvedReference
         HttpApplication = require(appModule).HttpApplication;
     }
     catch(err) {
@@ -215,7 +220,8 @@ module.exports.getHttpApplication = function getHttpApplication(options) {
         //get adapter types
         let adapterTypes = strategy.adapterTypes;
         //get configuration adapter types
-        let configurationAdapterTypes = app.getConfiguration().getSourceAt('adapterTypes');
+        // noinspection JSUnresolvedReference
+    let configurationAdapterTypes = app.getConfiguration().getSourceAt('adapterTypes');
         if (Array.isArray(configurationAdapterTypes)) {
             configurationAdapterTypes.forEach((configurationAdapterType)=> {
                 if (typeof adapterTypes[configurationAdapterType.invariantName] === 'undefined') {
@@ -257,6 +263,7 @@ module.exports.getHttpApplication = function getHttpApplication(options) {
         if (disableServices === false) {
             console.log('INFO','Loading application services');
             // get services configuration
+            // noinspection JSUnresolvedReference
             const ServicesConfiguration = require(appModule).ServicesConfiguration;
             // configure application
             ServicesConfiguration.config(app);
