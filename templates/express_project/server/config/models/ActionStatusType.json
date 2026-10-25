@@ -11,6 +11,11 @@
     "fields": [],
     "privileges": [
         {
+            "mask": 1,
+            "type": "global",
+            "account": "*"
+        },
+        {
             "mask": 15,
             "type": "global"
         },

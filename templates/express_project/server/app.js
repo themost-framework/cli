@@ -1,90 +1,68 @@
 
 import express from 'express';
-import engine from 'ejs-locals';
 import path from 'path';
-import cookieParser from 'cookie-parser';
-import session from 'express-session';
-import cookieSession from 'cookie-session';
-import passport from 'passport';
-import authRouter from './routes/auth';
-import logger from 'morgan';
-import sassMiddleware from 'node-sass-middleware';
-import { ExpressDataApplication, serviceRouter, dateReviver } from '@themost/express';
-import indexRouter from './routes/index';
-import usersRouter from './routes/users';
+import Twig from 'twig';
+import {ExpressDataApplication, serviceRouter, dateReviver, setContext} from '@themost/express';
+import {indexRouter} from './routes/index';
+import {TraceUtils} from '@themost/common';
+import { api } from './routes/api';
 
 /**
- * @name Request#context
- * @description Gets an instance of ExpressDataContext class which is going to be used for data operations
- * @type {ExpressDataContext}
+ * @returns {import('express').Application}
  */
-/**
- * @name express.Request#context
- * @description Gets an instance of ExpressDataContext class which is going to be used for data operations
- * @type {ExpressDataContext}
- */
+function getApplication() {
+  /**
+   * Initialize express application
+   * @type {import('express').Application}
+   */
+  const app = express();
 
-/**
- * Initialize express application
- * @type {Express}
- */
-let app = express();
-
-// use ejs-locals for all ejs templates
-app.engine('ejs', engine);
+  app.engine('twig', Twig.__express);
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+  app.set('view engine', 'twig');
+  app.set('views', path.join(__dirname, 'views'));
 
-app.use(logger('dev'));
+  app.use(express.json({
+    reviver: dateReviver
+  }));
+  app.use(express.urlencoded({ extended: false }));
 
-app.use(express.json({
-  reviver: dateReviver
-}));
-app.use(express.urlencoded({ extended: false }));
-
-// @themost/data data application setup
-const dataApplication = new ExpressDataApplication(path.resolve(__dirname, 'config'));
+// @themost/data application setup
+  const dataApplication = new ExpressDataApplication(path.resolve(__dirname, 'config'));
 // hold data application
-app.set('ExpressDataApplication', dataApplication);
-// use cookie parser
-const secret = dataApplication.getConfiguration().getSourceAt('settings/crypto/key');
-// use cookie parser
-app.use(cookieParser(secret));
+  app.set('ExpressDataApplication', dataApplication);
 
-// use session
-app.use(cookieSession({
-  name: 'session',
-  keys: [secret]
-}));
 // use data middleware (register req.context)
-app.use(dataApplication.middleware());
-// use passport
-app.use(authRouter(passport));
-// use sass middleware
-app.use(sassMiddleware({
-  src: path.join(process.cwd(), 'public'),
-  dest: path.join(process.cwd(), 'public'),
-  indentedSyntax: false, // true = .sass and false = .scss
-  sourceMap: true
-}));
+  app.use(setContext(dataApplication));
+
 // use static content
-app.use(express.static(path.join(process.cwd(), 'public')));
+  app.use(express.static(path.join(process.cwd(), 'public')));
 
-app.use('/', indexRouter);
+  app.use('/', indexRouter());
+  app.use('/v1/', api());
 
-app.use('/users', usersRouter);
-// use @themost/express service router
-app.use('/api', serviceRouter);
+  /**
+   *
+   * @returns {import('express').ErrorRequestHandler}
+   */
+  function errorHandler() {
+    return (err, req, res, next) => {
+      TraceUtils.error(err);
+      if (res.headersSent) {
+        return next(err);
+      }
+      res.status(err.status || err.statusCode || 500);
+      try {
+        res.render('error', { error: err });
+      } catch (e) {
+        TraceUtils.error(e);
+      }
+    }
+  }
 
 // error handler
-app.use((err, req, res) => {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-  // render the error page
-  res.status(err.status || err.statusCode || 500);
-  res.render('error');
-});
+  app.use(errorHandler());
+  return app;
+}
 
-module.exports = app;
+export { getApplication };

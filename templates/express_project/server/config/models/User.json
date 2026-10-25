@@ -29,7 +29,9 @@
             "title": "enabled",
             "description": "Indicates whether a user is enabled or not.",
             "type": "Boolean",
-            "value": "javascript:return true;"
+            "value": {
+                "$value": true
+            }
         },
         {
             "@id": "https://themost.io/schemas/lastLogon",
@@ -80,7 +82,7 @@
     ],
     "eventListeners": [
         {
-            "type": "./listeners/set-user-credentials-listener"
+            "type": "./listeners/SetUserCredentials"
         }
     ],
     "seed": [
@@ -98,7 +100,7 @@
             "description": "Administrator User",
             "groups": [
                 {
-                    "name": "Administrator"
+                    "name": "Administrators"
                 }
             ],
             "userCredentials": {

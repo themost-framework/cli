@@ -1,0 +1,14 @@
+{
+  "watch": [
+    "server"
+  ],
+  "verbose": true,
+  "legacy-watch": true,
+  "execMap": {
+    "js": "npm run build --silent && node --require @babel/register"
+  },
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "ext": "js,json"
+}
