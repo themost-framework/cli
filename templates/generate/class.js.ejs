@@ -1,11 +1,9 @@
-import {EdmMapping,EdmType} from '@themost/data/odata';
-import {DataObject} from '@themost/data/data-object';
+import {EdmMapping, DataObject} from '@themost/data';
 <% if (inherits) { %>let <%-inherits%> = require('<%-inheritsClassPath%>');<% }%>
 /**
  * @class
  <% attributes.filter(function(x) { return x.model === name; }).forEach(function(x) { %>
  * @property {<%-x.typeName%>} <%-x.property || x.name%><% }) %>
- * @augments {DataObject}
  */
 @EdmMapping.entityType('<%-name%>')
 class <%-name%> extends <%-inherits ? inherits : "DataObject"%> {
@@ -16,4 +14,7 @@ class <%-name%> extends <%-inherits ? inherits : "DataObject"%> {
         super();
     }
 }
-module.exports = <%-name%>;
+
+export {
+    <%-name%>
+}

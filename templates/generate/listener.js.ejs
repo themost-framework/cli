@@ -1,15 +1,20 @@
 /**
- * @param {DataEventArgs} event
+ * @param {import('@themost/data').DataEventArgs} event
  * @param {Function} callback
  */
-export function beforeSave(event, callback) {
+function beforeSave(event, callback) {
     return callback();
 }
 
 /**
- * @param {DataEventArgs} event
+ * @param {import('@themost/data').DataEventArgs} event
  * @param {Function} callback
  */
-export function afterSave(event, callback) {
+function afterSave(event, callback) {
     return callback();
+}
+
+export {
+    beforeSave,
+    afterSave
 }
