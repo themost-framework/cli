@@ -1,0 +1,9 @@
+# dist
+dist/
+
+# node_modules
+node_modules/
+
+# javascript
+*.js
+*.cjs

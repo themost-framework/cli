@@ -4,7 +4,7 @@
     "name": "Intangible",
     "title": "Intangibles",
     "description": "A utility class that serves as the umbrella for a number of 'intangible' things such as quantities, structured values, etc.",
-    "hidden": false,
+    "hidden": true,
     "sealed": false,
     "inherits": "Thing",
     "version": "1.0",

@@ -8,24 +8,15 @@
   "abstract": false,
   "version": "1.0",
   "inherits": "Thing",
-  "fields": [{
-      "name": "id",
-      "title": "ID",
-      "type": "Integer",
-      "nullable": false,
-      "primary": true
-    },
+  "fields": [
     {
+      "@id": "http://schema.org/url",
       "name": "url",
       "nullable": false
-    },
-    {
-      "name": "additionalType",
-      "readonly": true,
-      "value": "javascript:return this.model.name;"
     }
   ],
-  "privileges": [{
+  "privileges": [
+    {
       "mask": 1,
       "type": "global",
       "account": "*"
@@ -40,16 +31,20 @@
       "account": "Administrators"
     }
   ],
-  "constraints": [{
-    "type": "unique",
-    "fields": [
-      "url"
-    ]
-  }],
-  "seed": [{
-    "name": "Root Workspace",
-    "alternateName": "root",
-    "url": "/",
-    "description": "The default workspace associated with this application."
-  }]
+  "constraints": [
+    {
+      "type": "unique",
+      "fields": [
+        "url"
+      ]
+    }
+  ],
+  "seed": [
+    {
+      "name": "Root Workspace",
+      "alternateName": "root",
+      "url": "/",
+      "description": "The default workspace associated with this application."
+    }
+  ]
 }

@@ -3,7 +3,7 @@
     "@id": "http://schema.org/Enumeration",
     "name": "Enumeration",
     "description": "Lists or enumerations—for example, a list of cuisines or music genres, etc.",
-    "title": "Enumeration",
+    "title": "Enumerations",
     "abstract": false,
     "sealed": false,
     "inherits": "Intangible",

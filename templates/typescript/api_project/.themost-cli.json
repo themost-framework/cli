@@ -1,5 +1,5 @@
 {
     "mode": "typescript",
-    "base":"server",
-    "out": "dist/server"
+    "out":"dist/server",
+    "base":"server"
 }

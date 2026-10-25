@@ -1,4 +1,4 @@
-import {EdmMapping,EdmType} from '@themost/data/odata';
+import {EdmMapping,EdmType} from '@themost/data';
 <% locals.imports.forEach(function(x) { if (x.name==='{DataObject}') { %>
 import <%=x.name%> from '<%=x.from%>';<% } else { %>import <%=x.name%> = require('<%=x.from%>');
 <%}}) %>
@@ -17,4 +17,6 @@ class <%-name%> extends <%-inherits ? inherits : "DataObject"%> {
     }
 }
 
-export = <%-name%>;
+export {
+    <%-name%>
+}

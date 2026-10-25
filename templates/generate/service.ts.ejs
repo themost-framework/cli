@@ -1,10 +1,11 @@
-import {ApplicationService, IApplication} from '@themost/common/app';
+import {ApplicationService, ApplicationBase} from '@themost/common';
 
-export class <%-name%>Service extends ApplicationService {
-    /**
-     * @param {IApplication} app
-     */
-    constructor(app: IApplication) {
+class <%-name%>Service extends ApplicationService {
+    constructor(app: ApplicationBase) {
         super(app);
     }
+}
+
+export {
+    <%-name%>Service
 }

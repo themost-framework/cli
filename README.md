@@ -34,6 +34,19 @@ Applies the specified OData query options against the defined data model and pri
             [--group=<group by option>]
             [--expand=<expand option>]
 
+#### Interactive mode
+
+Use `--interactive` (or `-i`) to start an interactive shell which executes queries against the same application instance
+
+    themost cat -i [<data model name>]
+
+Each line accepts a data model name followed by the query options described above e.g.
+
+    cat> User --filter "name eq 'admin'" --select id,name --top 1
+
+Use `use <data model name>` to set the default data model and omit it from subsequent queries,
+`help` to print the available query options and `.exit` to quit.
+
 ### User modeler
 
 Use modeler commands to manage data models:

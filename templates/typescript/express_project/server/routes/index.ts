@@ -1,15 +1,12 @@
-import {Router} from 'express';
+import express from 'express';
 
-function indexRouter(): Router {
-    let router = Router();
-
+function indexRouter() {
+    const router = express.Router();
     /* GET home page. */
-    router.get('/', (req, res, next) => {
-    res.render('index', { title: 'Express' });
+    router.get('/', (_req, res, _next) => {
+      res.render('index', { title: 'Express server project using @themost framework' });
     });
     return router;
 }
 
-export {
-    indexRouter
-}
+export { indexRouter };

@@ -3,7 +3,7 @@
     "@id": "https://themost.io/schemas/Group",
     "name": "Group",
     "description": "Groups",
-    "title": "Group",
+    "title": "Groups",
     "abstract": false,
     "sealed": false,
     "inherits": "Account",

@@ -1,11 +1,18 @@
 {
+    "ts-node": {
+        "files": true
+    },
     "compilerOptions": {
-        "inlineSourceMap": true,
+        "rootDir": ".",
+        "ignoreDeprecations": "6.0",
+        "outDir": "./dist",
         "preserveSymlinks": true,
+        "sourceMap": true,
         "target": "es6",
         "module": "commonjs",
         "moduleResolution": "node",
         "emitDecoratorMetadata": true,
+        "skipLibCheck": true,
         "experimentalDecorators": true,
         "removeComments": false,
         "noImplicitAny": false,
@@ -21,6 +28,9 @@
             "dom"
         ]
     },
+    "include": [
+        "server/**/*.ts"
+    ],
     "exclude": [
         "node_modules",
         "spec"

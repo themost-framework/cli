@@ -2,13 +2,13 @@
     "settings": {
         "crypto": {
             "algorithm": "sha256",
-            "key": "2987c837c7dd2ecf2ea42be27f1e4a949c1cef508b36766a43f18f0167e65fc60f50696c530f8a598457efb1b8770316"
+            "key": "137f1d7a19de7d9094bbd7e2b76de15e6e7476c29639e2b1b53531d9812e2bb56ecf42995c8676d0dcfafc3c9f70320e"
         },
         "auth": {
             "name": ".MAUTH",
             "timeout": 480,
             "slidingExpiration": false,
-            "unattendedExecutionAccount": "HDeFklZQ7EB79KpF"
+            "unattendedExecutionAccount": "cvwa7OYHnxDOJa8v"
         },
         "i18n": {
             "locales": [
