@@ -15,7 +15,7 @@
     "node": ">=22.0.0"
   },
   "devDependencies": {
-    "@themost/cli": "^2.1.8",
+    "@themost/cli": "^2",
     "@types/express": "^5.0.6",
     "@types/express-serve-static-core": "^5.1.3",
     "@types/lodash": "^4.17.26",
