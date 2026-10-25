@@ -24,7 +24,9 @@
             "description": "The date on which this item was created.",
             "type": "DateTime",
             "readonly":true,
-            "value": "javascript:return new Date();"
+            "value": {
+                "$date": 1
+            }
         },
         {
             "@id": "https://themost.io/schemas/dateModified",
@@ -33,8 +35,12 @@
             "description": "The date on which this item was most recently modified.",
             "type": "DateTime",
             "readonly":true,
-            "value":"javascript:return new Date();",
-            "calculation":"javascript:return new Date();"
+            "value": {
+                "$date": 1
+            },
+            "calculation": {
+                "$date": 1
+            }
         },
         {
             "@id": "https://themost.io/schemas/createdBy",
@@ -43,7 +49,9 @@
             "description": "Created by user.",
             "type": "Integer",
             "readonly":true,
-            "value":"javascript:return this.user();"
+            "value":{
+                "$user": 1
+            }
         },
         {
             "@id": "https://themost.io/schemas/modifiedBy",
@@ -52,15 +60,21 @@
             "description": "Last modified by user.",
             "type": "Integer",
             "readonly":true,
-            "value":"javascript:return this.user();",
-            "calculation":"javascript:return this.user();"
+            "value":{
+                "$user": 1
+            },
+            "calculation":{
+                "$user": 1
+            }
         },
         {
             "@id": "https://themost.io/schemas/privilege",
             "name": "privilege",
             "title": "privilege",
             "description": "The privilege where this permission refers",
-            "type": "Text"
+            "type": "Text",
+            "nullable": false,
+            "indexed": true
         },
         {
             "@id": "https://themost.io/schemas/parentPrivilege",
@@ -74,7 +88,9 @@
             "name": "account",
             "title": "account",
             "description": "The account which is related with this permission.",
-            "type": "Account"
+            "type": "Account",
+            "nullable": false,
+            "indexed": true
         },
         {
             "@id": "https://themost.io/schemas/target",
@@ -88,16 +104,18 @@
             "name": "mask",
             "title": "mask",
             "description": "The permission mask.",
-            "type": "Integer"
+            "nullable": false,
+            "type": "Integer",
+            "value": {
+                "$value": 0
+            }
         },
         {
             "@id": "https://themost.io/schemas/target",
             "name": "workspace",
             "title": "Workspace",
             "description": "The workspace where this permission may be applied.",
-            "type": "Integer",
-            "readonly":true,
-            "value":"javascript:return 1;"
+            "type": "Integer"
         }
     ],
     "privileges": [
@@ -112,11 +130,11 @@
         }
     ],
     "seed": [
-        { "privilege":"Permission", "workspace":1, "account": { "name":"Administrators" }, "target":0, "mask":15 },
-        { "privilege":"User", "workspace":1, "account": { "name":"Administrators" }, "target":0, "mask":15 },
-        { "privilege":"Group", "workspace":1, "account": { "name":"Administrators" }, "target":0, "mask":15 },
-        { "privilege":"Thing", "workspace":1, "account": { "name":"Administrators" }, "target":0, "mask":15 },
-        { "privilege":"Account", "workspace":1, "account": { "name":"Administrators" }, "target":0, "mask":15 },
-        { "privilege":"Workspace", "workspace":1, "account": { "name":"Administrators" }, "target":0, "mask":15 }
+        { "privilege":"Permission", "account": { "name":"Administrators" }, "target":0, "mask":15 },
+        { "privilege":"User", "account": { "name":"Administrators" }, "target":0, "mask":15 },
+        { "privilege":"Group", "account": { "name":"Administrators" }, "target":0, "mask":15 },
+        { "privilege":"Thing", "account": { "name":"Administrators" }, "target":0, "mask":15 },
+        { "privilege":"Account", "account": { "name":"Administrators" }, "target":0, "mask":15 },
+        { "privilege":"Workspace", "account": { "name":"Administrators" }, "target":0, "mask":15 }
     ]
 }

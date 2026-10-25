@@ -3,7 +3,7 @@
     "@id": "https://themost.io/schemas/User",
     "name": "User",
     "description": "Users",
-    "title": "User",
+    "title": "Users",
     "abstract": false,
     "sealed": false,
     "inherits": "Account",
@@ -29,7 +29,9 @@
             "title": "enabled",
             "description": "Indicates whether a user is enabled or not.",
             "type": "Boolean",
-            "value": "javascript:return true;"
+            "value": {
+                "$value": true
+            }
         },
         {
             "@id": "https://themost.io/schemas/lastLogon",
@@ -63,12 +65,6 @@
         }
     ],
     "privileges": [
-
-        {
-            "mask": 1,
-            "type": "self",
-            "filter": "id eq me()"
-        },
         {
             "mask": 15,
             "type": "global"
@@ -77,6 +73,16 @@
             "mask": 15,
             "type": "global",
             "account": "Administrators"
+        },
+        {
+            "mask": 1,
+            "type": "self",
+            "filter": "id eq me()"
+        }
+    ],
+    "eventListeners": [
+        {
+            "type": "./listeners/SetUserCredentials"
         }
     ],
     "seed": [
@@ -88,6 +94,18 @@
                     "name": "Guests"
                 }
             ]
+        },
+        {
+            "name": "admin",
+            "description": "Administrator User",
+            "groups": [
+                {
+                    "name": "Administrators"
+                }
+            ],
+            "userCredentials": {
+                "userPassword": "{clear}secret"
+            }
         }
     ]
 }

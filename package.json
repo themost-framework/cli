@@ -51,6 +51,9 @@
     "yargs": "^15.4.1"
   },
   "devDependencies": {
+    "@themost/common": "^2.12.4",
+    "@themost/data": "^2.24.3",
+    "@themost/query": "^2.15.2",
     "@types/fs-extra": "^5.0.3",
     "@types/yargs": "^11.0.0",
     "assert": "^1.4.1",

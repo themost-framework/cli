@@ -1,95 +1,46 @@
 {
-  "name": "api-server-project",
+  "name": "express-server-project",
   "version": "0.1.0",
-  "description": "Api Server Project",
-  "main": "bin/www.js",
-  "repository": "",
+  "description": "Express server project using @themost framework",
+  "main": "dist/server/standalone.js",
   "private": true,
-  "author": "",
   "scripts": {
-    "start": "node bin/www.js",
-    "clean": "rimraf dist/server",
+    "start": "node dist/server/standalone.js",
     "build": "rimraf dist/server && babel server --out-dir dist/server --copy-files --source-maps",
-    "themost": "themost",
-    "serve": "nodemon bin/www.js",
-    "debug": "nodemon --inspect-brk bin/www.js"
+    "cli": "themost",
+    "dev": "nodemon dist/server/standalone.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
   },
   "devDependencies": {
-    "babel-eslint": "^10.0.1",
-    "@themost/cli": "latest",
-    "@babel/cli": "^7.1.5",
-    "@babel/core": "^7.1.5",
-    "@babel/plugin-proposal-class-properties": "^7.1.0",
-    "@babel/plugin-proposal-decorators": "^7.1.0",
-    "@babel/plugin-proposal-export-default-from": "^7.0.0",
-    "@babel/plugin-proposal-export-namespace-from": "^7.0.0",
-    "@babel/plugin-transform-async-to-generator": "^7.1.0",
-    "@babel/preset-env": "^7.1.6",
-    "@babel/register": "^7.0.0",
-    "rimraf": "^2.6.3",
-    "nodemon": "^1.19.0"
+    "@babel/cli": "^7",
+    "@babel/core": "^7",
+    "@babel/plugin-proposal-decorators": "^7",
+    "@babel/preset-env": "^7",
+    "@babel/register": "^7",
+    "@babel/runtime": "^7",
+    "@themost/cli": "^2.1.8",
+    "@types/express": "^5.0.6",
+    "@types/express-serve-static-core": "^5.1.3",
+    "@types/lodash": "^4.17.26",
+    "@types/serve-static": "^2.2.0",
+    "eslint": "^8.57.1",
+    "nodemon": "^3.1.14",
+    "rimraf": "^3.0.2"
   },
   "dependencies": {
-    "@themost/client": "latest",
-    "@themost/common": "latest",
-    "@themost/data": "latest",
-    "@themost/node": "latest",
-    "@themost/query": "latest",
-    "@themost/sqlite": "latest",
-    "@themost/web": "latest",
-    "@themost/xml": "latest",
-    "bootstrap": "^4.1.0",
-    "jquery": "^3.3.1",
-    "popper.js": "^1.14.7"
-  },
-  "nodemonConfig": {
-    "watch": [
-      "server",
-      "bin"
-    ],
-    "verbose": true,
-    "legacy-watch": true,
-    "execMap": {
-      "js": "node --require @babel/register"
-    },
-    "env": {
-      "NODE_ENV": "development"
-    },
-    "ext": "js,json"
-  },
-  "eslintConfig": {
-    "parser": "babel-eslint",
-    "env": {
-      "browser": false,
-      "node": true,
-      "es6": true,
-      "jquery": false
-    },
-    "globals": {
-      "describe": false,
-      "it": false,
-      "angular": false,
-      "jQuery": false,
-      "before": false,
-      "after": false
-    },
-    "extends": "eslint:recommended",
-    "rules": {
-      "no-console": "warn",
-      "no-invalid-this": "warn",
-      "no-undef": "error",
-      "no-unused-vars": "warn",
-      "no-var": [
-        "error"
-      ],
-      "strict": [
-        2,
-        "never"
-      ],
-      "quotes": [
-        2,
-        "single"
-      ]
-    }
+    "@themost/client": "^2",
+    "@themost/common": "^2",
+    "@themost/data": "^2",
+    "@themost/express": "^5",
+    "@themost/node": "^2",
+    "@themost/query": "^2",
+    "@themost/sqlite": "lts-22",
+    "@themost/web": "^2",
+    "@themost/xml": "^2",
+    "express": "^5.3.0",
+    "minimist": "^1.2.8",
+    "twig": "^3.0.0"
   }
 }

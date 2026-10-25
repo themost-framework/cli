@@ -14,10 +14,14 @@ module.exports.desc = 'Create a new project';
 module.exports.builder = function builder(yargs) {
     return yargs.option('template', {
         describe:'the target template',
-        choices: ['api', 'express', 'classic'],
-        default:'classic'
-    }).option('typescipt', {
+        choices: ['api', 'express'],
+        default:'api'
+    }).option('typescript', {
         describe:'generates a typescript project',
+        default: false,
+        type: 'boolean'
+    }).option('skip-install', {
+        describe:'skips installing dependencies',
         default: false,
         type: 'boolean'
     });

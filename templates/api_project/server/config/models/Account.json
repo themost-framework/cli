@@ -9,7 +9,7 @@
     "inherits": "Thing",
     "version": "1.0",
     "fields": [
-    ],
+        ],
     "privileges": [
         {
             "mask": 15,

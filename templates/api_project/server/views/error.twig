@@ -1,0 +1,14 @@
+{% extends "master.twig" %}
+
+{% block content %}
+    <div class="container">
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h2 class="fw-normal">{{ error.message }}</h2>
+                {% if error.stack != null %}
+                    <p class="fw-normal">Status: {{ error.stack }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

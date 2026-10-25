@@ -1,0 +1,32 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:node/recommended"
+],
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": false,
+    "jquery": false
+  },
+  "globals": {
+    "describe": false,
+    "it": false
+  },
+  "rules": {
+    "no-console": "warn",
+    "no-invalid-this": "warn",
+    "no-undef": "error",
+    "no-unused-vars": "warn",
+    "quotes": [ "error", "single" ],
+    "no-var": "off",
+    "strict": [
+      2,
+      "never"
+    ]
+  }
+}

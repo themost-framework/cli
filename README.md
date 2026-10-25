@@ -6,7 +6,7 @@ A command line utility for [Most Web Framework](https://github.com/themost-frame
 
 ### Generate a new MOST Web Framework application
 
-    themost new project <project name> [--template <api|classic>] [--typescript]
+    themost new project <project name> [--template <api|express>] [--typescript]
 
 Note: Use --typescript flag if you want to generate a typescript project.
     

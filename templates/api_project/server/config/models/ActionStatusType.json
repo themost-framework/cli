@@ -3,13 +3,18 @@
     "@id": "http://schema.org/ActionStatusType",
     "name": "ActionStatusType",
     "description": "The status of an Action.",
-    "title": "ActionStatusType",
+    "title": "ActionStatusTypes",
     "abstract": false,
     "sealed": false,
     "implements": "Enumeration",
     "version": "1.0",
     "fields": [],
     "privileges": [
+        {
+            "mask": 1,
+            "type": "global",
+            "account": "*"
+        },
         {
             "mask": 15,
             "type": "global"
