@@ -121,7 +121,7 @@ function writeResult(result, argv) {
     if (argv.out) {
         let outFile = path.resolve(process.cwd(), argv.out);
         return fs.writeFile(outFile, JSON.stringify(result,null,4),'utf8').then(() => {
-            console.error('INFO',`Data was succesfully exported to ${outFile}`);
+            console.error('INFO',`Data was successfully exported to ${outFile}`);
         });
     }
     if (isInteractiveSession()) {
