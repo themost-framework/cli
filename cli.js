@@ -6,7 +6,7 @@ const args = process.argv.slice(2);
 
 if (isInteractive(args)) {
     // start an interactive shell and execute the given command, if any
-    startInteractive(stripInteractive(args));
+    startInteractive(stripInteractive(args)).then(() => void 0);
 } else {
     process.on('unhandledRejection', (reason, p) => {
         console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
