@@ -84,7 +84,7 @@ module.exports.handler = function (argv) {
                 modelToPrint.implements = model.implements;
             }
             console.log(Table.print(modelToPrint));
-            getFields(generator, argv.model).then(function(fields) {
+            return getFields(generator, argv.model).then(function(fields) {
                 // print model attributes
                 console.log('');
                 console.log('Fields');

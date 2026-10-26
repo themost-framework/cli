@@ -50,13 +50,8 @@ module.exports.handler = function handler(argv) {
         console.error('ERROR: The specified template cannot be found.');
         return process.exit(1);
     }
-    copy(templateRoot, projectRoot, err => {
-            if (err) {
-                console.error('ERROR: An error occurred while generating new project.');
-                console.error(err);
-                return process.exit(1);
-            }
-            Promise.all([
+    return copy(templateRoot, projectRoot).then(() => {
+            return Promise.all([
                 updateApplicationConfiguration(argv)
                 ]).then(()=> {
                     console.log('Operation was completed successfully');
@@ -66,8 +61,12 @@ module.exports.handler = function handler(argv) {
                     console.error(err);
                     return process.exit(1);
                 });
+        }, err => {
+            console.error('ERROR: An error occurred while generating new project.');
+            console.error(err);
+            return process.exit(1);
         });
-    
+
 };
 
 function updateApplicationConfiguration(argv) {

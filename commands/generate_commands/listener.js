@@ -37,12 +37,11 @@ module.exports.handler = function handler(argv) {
     //get destination folder path
     let destFolder = path.dirname(destPath);
     console.error('INFO',`Validating listener folder (${destFolder}).`);
-    return fs.ensureDir(destFolder, (err)=> {
-       if (err) {
+    return fs.ensureDir(destFolder).catch((err) => {
            console.error('ERROR','An error occurred while validating destination path.');
-            console.error(err);
-       } 
-       writeFileFromTemplate(templateFile, destPath, {
+           console.error(err);
+    }).then(() => {
+       return writeFileFromTemplate(templateFile, destPath, {
             name:_.upperFirst(_.camelCase(argv.name))
         }).then(()=> {
             console.log('INFO','The operation was completed succesfully.');

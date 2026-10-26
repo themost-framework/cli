@@ -1,5 +1,4 @@
 const {getApplication, getConfiguration} = require('../util');
-const { executeInUnattendedModeAsync } = require('@themost/data');
 const fs = require('fs-extra');
 const path = require('path');
 
@@ -31,7 +30,7 @@ module.exports.handler = function handler(argv) {
     let options = getConfiguration();
     if (typeof argv.model === 'undefined' || argv.model === null) {
         console.error('ERROR','The target cannot be empty');
-        process.exit(1);
+        return process.exit(1);
     }
     if (argv.configuration === 'development') {
         //set development mode
@@ -47,12 +46,7 @@ module.exports.handler = function handler(argv) {
     //get data
     console.log('INFO','Getting item(s)');
     let data;
-        return fs.readFile(path.resolve(process.cwd(),argv.file), 'utf8', (err, str)=> {
-            if (err) {
-                console.error('ERROR','An error occurred while trying to get items');
-                console.error(err);
-                return process.exit(1);
-            }
+        return fs.readFile(path.resolve(process.cwd(),argv.file), 'utf8').then((str)=> {
             try {
                 data = JSON.parse(str, reviveDates);
             }
@@ -63,7 +57,8 @@ module.exports.handler = function handler(argv) {
             }
             let app = getApplication(options);
             const context = app.createContext();
-            void executeInUnattendedModeAsync(context, async () => {
+            const { executeInUnattendedModeAsync } = require('@themost/data');
+            return executeInUnattendedModeAsync(context, async () => {
                 /**
                  * @type {import('@themost/data').DataModel}
                  */
@@ -120,5 +115,9 @@ module.exports.handler = function handler(argv) {
                     console.error(err);
                     return process.exit(1);
                 });
+            }, (err) => {
+                console.error('ERROR','An error occurred while trying to get items');
+                console.error(err);
+                return process.exit(1);
             });
 };

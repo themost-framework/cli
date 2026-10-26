@@ -12,9 +12,9 @@ const fs = require('fs-extra');
 const path = require('path');
 
 const configurationDefaults = {
-                "base":"server",
-                "out": "dist/server"
-            };
+    "base":"server",
+    "out": "dist/server"
+};
 
 /**
  *
@@ -41,10 +41,10 @@ function writeFileFromTemplate(source, dest, data) {
         return new Promise((resolve, reject)=> {
             //write file
             fs.writeFile(dest, res, (err) => {
-              if (err) {
+                if (err) {
                     return reject(err);
-              }
-              return resolve();
+                }
+                return resolve();
             });
         });
     });
@@ -72,51 +72,51 @@ function getConfiguration() {
     catch(err) {
         if (err.code === 'MODULE_NOT_FOUND') {
             console.error('ERROR','Configuration cannot be found. It seems that current working directory does not contain a MOST Web Framework project.');
-            process.exit(1);
+            return process.exit(1);
         }
         else {
             console.error('ERROR','An error occurred while loading configuration.');
             console.error(err);
-            process.exit(1);
+            return process.exit(1);
         }
     }
 }
 
 module.exports.getConfiguration = getConfiguration;
 
-    class SimpleDataContext {
+class SimpleDataContext {
     constructor(configuration) {
         this.getConfiguration = ()=> configuration;
     }
-   getStrategy(strategyCtor) {
-    return this.getConfiguration().getStrategy(strategyCtor);
-  }
-  
-  model(name) {
-    let self = this;
-    if ((name === null) || (name === undefined))
-        return null;
-    let obj = self.getConfiguration().getStrategy(function DataConfigurationStrategy() {}).model(name);
-    if (_.isNil(obj)) {
-        return null;
+    getStrategy(strategyCtor) {
+        return this.getConfiguration().getStrategy(strategyCtor);
     }
-    //do some things for CLI only
-    //remove class path if any
-    delete obj.classPath;
-    //clear event listeners
-    obj.eventListeners = [];
-    let dataModule = require.resolve('@themost/data',{
+
+    model(name) {
+        let self = this;
+        if ((name === null) || (name === undefined))
+            return null;
+        let obj = self.getConfiguration().getStrategy(function DataConfigurationStrategy() {}).model(name);
+        if (_.isNil(obj)) {
+            return null;
+        }
+        //do some things for CLI only
+        //remove class path if any
+        delete obj.classPath;
+        //clear event listeners
+        obj.eventListeners = [];
+        let dataModule = require.resolve('@themost/data',{
             paths:[path.resolve(process.cwd(), 'node_modules')]
         });
-    // noinspection JSUnresolvedReference
-      let DataModel = require(dataModule).DataModel,
-        model = new DataModel(obj);
-    //set model context
-    model.context = self;
-    //return model
-    return model;
-  }
-  
+        // noinspection JSUnresolvedReference
+        let DataModel = require(dataModule).DataModel,
+            model = new DataModel(obj);
+        //set model context
+        model.context = self;
+        //return model
+        return model;
+    }
+
 }
 
 module.exports.SimpleDataContext = SimpleDataContext;
@@ -156,22 +156,22 @@ module.exports.getDataConfiguration = function getDataConfiguration(options) {
         }
         return model;
     };
-    
+
     return res;
-    
+
 };
 
 module.exports.getBuilder = function getBuilder(config) {
     let ODataConventionModelBuilder;
     let dataModule = require.resolve('@themost/data',{
-            paths:[path.resolve(process.cwd(), 'node_modules')]
-        });
+        paths:[path.resolve(process.cwd(), 'node_modules')]
+    });
     // noinspection JSUnresolvedReference
     ODataConventionModelBuilder = require(dataModule).ODataConventionModelBuilder;
-    
+
     let dataObjectModule = require.resolve('@themost/data',{
-            paths:[path.resolve(process.cwd(), 'node_modules')]
-        });
+        paths:[path.resolve(process.cwd(), 'node_modules')]
+    });
     //disable data model class loader
     config.getStrategy(function ModelClassLoaderStrategy() {}).resolve = function(model) {
         // noinspection JSUnresolvedReference
@@ -180,16 +180,36 @@ module.exports.getBuilder = function getBuilder(config) {
     return new ODataConventionModelBuilder(config);
 };
 
+/**
+ * The application instance which is shared across commands e.g. in interactive mode
+ * @type {*}
+ */
+let currentApplication = null;
+
+/**
+ * Returns the current application instance or creates a new one if it does not exist
+ * @param {*} options
+ * @returns {*}
+ */
 module.exports.getApplication = function getApplication(options) {
-    let HttpApplication;
-    let appModule;
+    if (currentApplication == null) {
+        currentApplication = createApplication(options);
+    }
+    return currentApplication;
+};
+
+function createApplication(options) {
+    let ApplicationClassOrFunction;
     if (options.application) {
         // try to create application from custom module
         let [customModule, className] = options.application.split('#');
         if (className) {
-            const ApplicationClass = require(customModule)[className];
+            if (customModule.startsWith('.')) {
+                customModule = path.resolve(process.cwd(), customModule);
+            }
+            ApplicationClassOrFunction = require(customModule)[className];
             // create a new instance of application passing the output directory as the current path
-            return new ApplicationClass(path.resolve(process.cwd(), options.out));
+            return new ApplicationClassOrFunction(path.resolve(process.cwd(), options.out));
         }
         if (typeof customModule !== 'function') {
             throw new Error(`Invalid application module. The module ${options.application} does not export a function.`);
@@ -197,11 +217,13 @@ module.exports.getApplication = function getApplication(options) {
         return customModule(path.resolve(process.cwd(), options.out));
     }
     try {
-        appModule = require.resolve('@themost/web',{
-            paths:[path.resolve(process.cwd(), 'node_modules')]
+        const applicationModule = require.resolve('@themost/express',{
+            paths:[
+                path.resolve(process.cwd(), 'node_modules')
+            ]
         });
         // noinspection JSUnresolvedReference
-        HttpApplication = require(appModule).HttpApplication;
+        ApplicationClassOrFunction = require(applicationModule).ExpressDataApplication;
     }
     catch(err) {
         if (err.code === 'MODULE_NOT_FOUND') {
@@ -214,59 +236,7 @@ module.exports.getApplication = function getApplication(options) {
         return process.exit(1);
     }
     console.log('INFO','Initializing application');
-    let app  = new HttpApplication(path.resolve(process.cwd(), options.out));
-        let strategy = app.getConfiguration().getStrategy(function DataConfigurationStrategy() {
-        });
-        //get adapter types
-        let adapterTypes = strategy.adapterTypes;
-        //get configuration adapter types
-        // noinspection JSUnresolvedReference
-    let configurationAdapterTypes = app.getConfiguration().getSourceAt('adapterTypes');
-        if (Array.isArray(configurationAdapterTypes)) {
-            configurationAdapterTypes.forEach((configurationAdapterType)=> {
-                if (typeof adapterTypes[configurationAdapterType.invariantName] === 'undefined') {
-                    //load adapter type
-                    let adapterModulePath = require.resolve(configurationAdapterType.type,{
-                        paths:[path.resolve(process.cwd(), 'node_modules')]
-                    });
-                    let adapterModule = require(adapterModulePath);
-                    adapterTypes[configurationAdapterType.invariantName] = {
-                        invariantName:configurationAdapterType.invariantName,
-                        name: configurationAdapterType.name,
-                        createInstance:adapterModule.createInstance
-                    };
-                }
-            });
-        }
-        // auto register application extensions
-        let disableExtensions = false;
-        if (Object.prototype.hasOwnProperty.call(options, 'disableExtensions')) {
-            disableExtensions = options.disableExtensions;
-        }
-        if (disableExtensions === false) {
-            console.log('INFO','Loading application extensions');
-            const extensionsDir = path.resolve(process.cwd(), options.out, 'extensions');
-            if (fs.existsSync(extensionsDir)) {
-                const extensionModules = fs.readdirSync(extensionsDir);
-                extensionModules.filter((extensionModule) => {
-                    return path.extname(extensionModule) === '.js';
-                }).forEach((extensionModule) => {
-                    require(path.resolve(extensionsDir, extensionModule));
-                });
-            }
-        }
-        // auto register application services
-        let disableServices = false;
-        if (Object.prototype.hasOwnProperty.call(options, 'disableServices')) {
-            disableServices = options.disableServices;
-        }
-        if (disableServices === false) {
-            console.log('INFO','Loading application services');
-            // get services configuration
-            // noinspection JSUnresolvedReference
-            const ServicesConfiguration = require(appModule).ServicesConfiguration;
-            // configure application
-            ServicesConfiguration.config(app);
-        }
-    return app;
-};
+    return new ApplicationClassOrFunction(path.resolve(process.cwd(), options.out, 'config'));
+}
+
+module.exports.createApplication = createApplication;

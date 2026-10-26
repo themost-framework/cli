@@ -192,7 +192,7 @@ module.exports.builder = function builder(yargs) {
 };
 
 module.exports.handler =  function handler(argv) {
-    generateAnyDefinition(argv).then(() => {
+    return generateAnyDefinition(argv).then(() => {
         return process.exit(0);
     }).catch((err) => {
         console.error(err);

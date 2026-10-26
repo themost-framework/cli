@@ -34,18 +34,20 @@ Applies the specified OData query options against the defined data model and pri
             [--group=<group by option>]
             [--expand=<expand option>]
 
-#### Interactive mode
+### Interactive mode
 
-Use `--interactive` (or `-i`) to start an interactive shell which executes queries against the same application instance
+Use `--interactive` (or `-i`) to start an interactive shell which executes any command against the same process,
+so the application instance is loaded once and shared across commands
 
-    themost cat -i [<data model name>]
+    themost -i
 
-Each line accepts a data model name followed by the query options described above e.g.
+Each line accepts a command with its options e.g.
 
-    cat> User --filter "name eq 'admin'" --select id,name --top 1
+    themost> cat User --filter "name eq 'admin'" --select id,name --top 1
+    themost> import data/users.json --model User
 
-Use `use <data model name>` to set the default data model and omit it from subsequent queries,
-`help` to print the available query options and `.exit` to quit.
+A command passed together with `-i` is executed before prompting e.g. `themost cat User --top 1 -i`.
+Use `help` to print the available commands, `help <command>` for command options and `exit` (or `.exit`) to quit.
 
 ### User modeler
 

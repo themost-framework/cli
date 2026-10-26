@@ -37,12 +37,11 @@ module.exports.handler = function handler(argv) {
     //get destination folder path
     let destFolder = path.dirname(controllerPath);
     console.error('INFO',`Validating controller folder (${destFolder}).`);
-    fs.ensureDir(destFolder, (err)=> {
-       if (err) {
+    return fs.ensureDir(destFolder).catch((err) => {
            console.error('ERROR','An error occurred while validating destination path.');
-            console.error(err);
-       } 
-       writeFileFromTemplate(templateFile, controllerPath, {
+           console.error(err);
+    }).then(() => {
+       return writeFileFromTemplate(templateFile, controllerPath, {
             name:controllerName.replace(/Controller$/i,'')
         }).then(()=> {
             console.log('INFO','The operation was completed succesfully.');

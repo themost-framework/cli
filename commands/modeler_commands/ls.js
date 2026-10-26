@@ -19,7 +19,7 @@ module.exports.handler = function (argv) {
     // get output directory
     let outDir = path.resolve(process.cwd(), options.base, 'config/models/');
     const generator = new ModelGenerator();
-    generator.getList().then( function(list) {
+    return generator.getList().then( function(list) {
         const res = _.map(list, function(x) {
             if (x.description.length>32) {
                 x.description = x.description.substr(0,29).concat('...');
