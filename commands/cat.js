@@ -1,6 +1,7 @@
 // MOST Web Framework Copyright (c) 2017-2022, THEMOST LP All rights reserved
 const getConfiguration = require('../util').getConfiguration;
 const getApplication = require('../util').getApplication;
+const isInteractiveSession = require('../interactive').isInteractiveSession;
 const fs = require('fs-extra');
 const path = require('path');
 
@@ -122,6 +123,10 @@ function writeResult(result, argv) {
         return fs.writeFile(outFile, JSON.stringify(result,null,4),'utf8').then(() => {
             console.error('INFO',`Data was succesfully exported to ${outFile}`);
         });
+    }
+    if (isInteractiveSession()) {
+        // clear previous output of interactive shell
+        console.clear();
     }
     console.log(JSON.stringify(result,null,4));
     return Promise.resolve();

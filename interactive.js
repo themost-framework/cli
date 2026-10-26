@@ -103,11 +103,26 @@ function createParser(done, started) {
 }
 
 /**
+ * True if the current process runs an interactive shell
+ * @type {boolean}
+ */
+let interactiveSession = false;
+
+/**
+ * Returns true if the current process runs an interactive shell
+ * @returns {boolean}
+ */
+function isInteractiveSession() {
+    return interactiveSession;
+}
+
+/**
  * Starts an interactive shell which executes cli commands against the same process
  * so as the application instance is loaded once and shared across commands
  * @param {Array<string>=} initialArgs - a command to execute before prompting
  */
 function startInteractive(initialArgs) {
+    interactiveSession = true;
     const exit = process.exit;
     let queue = Promise.resolve();
     let closed = false;
@@ -172,10 +187,10 @@ function startInteractive(initialArgs) {
 
     const commands = createParser(() => {}, () => {}).getCommandInstance().getCommands();
     const keywords = ['help', 'exit'].concat(commands);
-    console.log('Type a command e.g. cat User --top 1, "help" for available commands or ".exit" to quit.');
+    console.log('Type a command e.g. cat User --top 1, "help" for available commands or "exit" to quit.');
     const startRepl = () => {
         const server = repl.start({
-            prompt: 'themost> ',
+            prompt: '@themost> ',
             ignoreUndefined: true,
             completer: (line) => {
                 const words = line.split(/\s+/);
@@ -228,3 +243,4 @@ module.exports.parseArgs = parseArgs;
 module.exports.isInteractive = isInteractive;
 module.exports.stripInteractive = stripInteractive;
 module.exports.startInteractive = startInteractive;
+module.exports.isInteractiveSession = isInteractiveSession;
