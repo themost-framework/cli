@@ -1,4 +1,3 @@
-// MOST Web Framework Copyright (c) 2017-2022, THEMOST LP All rights reserved
 const writeFileFromTemplate = require('../../util').writeFileFromTemplate;
 const getConfiguration = require('../../util').getConfiguration;
 const SimpleDataContext = require('../../util').SimpleDataContext;
@@ -7,6 +6,7 @@ const getDataConfiguration = require('../../util').getDataConfiguration;
 const fs = require('fs-extra');
 const path = require('path');
 const _ = require('lodash');
+const generateClassDefinitionHandler = require('./classdef').handler;
 
 
 function generateAnyClass(argv) {
@@ -19,14 +19,12 @@ function generateAnyClass(argv) {
     let builder = getBuilder(config);
     let sources = [];
     return builder.getEdm().then((schema)=> {
-        console.log('INFO', argv);
         if (argv.name === 'app' || argv.name === '*') {
             sources = schema.entityType.map((x)=> {
                 return generateClass(Object.assign({
                     inProcClass:[]
                 }, argv, {
-                    "name": x.name,
-                    "silent": true
+                    "name": x.name
                 }), true);
             });
         }
@@ -35,8 +33,7 @@ function generateAnyClass(argv) {
                 return generateClass(Object.assign({
                     inProcClass:[]
                 }, argv, {
-                    "name": x,
-                    "silent": true
+                    "name": x
                 }), false);
             });
         }
@@ -56,7 +53,7 @@ function generateClass(argv, ignoreOther) {
         //validating name
         if (!/^[a-zA-Z0-9_-]+$/.test(argv.name)) {
             console.error('ERROR', 'An error occurred while validating class name.');
-            return reject(new Error('Class name is not valid. Expected only latin characters, numbers or "_,-" characters.'));
+            return reject(new Error('Class name is not valid. Expected only Latin characters, numbers or "_,-" characters.'));
         }
         //--
         let context = new SimpleDataContext(config);
@@ -79,7 +76,9 @@ function generateClass(argv, ignoreOther) {
                 model.inherits = model.inherits || null; 
                 model.imports = [];
                 if (model.inherits) {
-                    model.inheritsClassPath = "./".concat(_.dasherize(model.inherits).concat('-model'));
+                    const inheritedModel = context.model(model.inherits);
+                    const InheritedModelClass = inheritedModel.getDataObjectType();
+                    model.inheritsClassPath = './'.concat(model.inherits);
                     model.imports.push({
                       "name": model.inherits,
                       "from": model.inheritsClassPath
@@ -87,8 +86,8 @@ function generateClass(argv, ignoreOther) {
                 }
                 else {
                     model.imports.push({
-                      "name": "{DataObject}",
-                      "from": "@themost/data/data-object"
+                      "name": "DataObject",
+                      "from": "@themost/data"
                     });
                 }
                 model.attributes.forEach((x)=> {
@@ -108,21 +107,21 @@ function generateClass(argv, ignoreOther) {
                             if (typeof model.imports.find((x)=> { return x.name === importModel.name }) === 'undefined') {
                                 model.imports.push({
                                     "name": importModel.name,
-                                    "from": "./".concat(_.dasherize(importModel.name).concat('-model'))
-                                });    
+                                    "from": "./".concat(importModel.name)
+                                });
                             }
-                            x.typeName = x.many ?  "Array<" + x.type + "|any>" : x.type + "|any";
+                            x.typeName = x.many ?  'Array<*>' : '*';
                             return;
-                        }    
+                        }
                     }
                     if (dataType) {
                         x.typeName = x.many ?  "Array<" + dataType.type + ">" : dataType.type;
                         return;
                     }
-                    x.typeName = x.many ?  "Array<" + x.type + ">" : x.type;
+                    x.typeName = x.many ?  'Array<*>' : '*';
                 });
                 //get file name
-                let destFile = _.dasherize(argv.name).concat('-model').concat(options.mode==='typescript' ? '.ts': '.js');
+                let destFile = model.name.concat(options.mode==='typescript' ? '.ts': '.js');
                 console.log('INFO', `Generating class ${destFile}`);
                 let destPath = path.resolve(process.cwd(), options.base, `models/${destFile}`);
                 console.log('INFO', `Validating class path ${destPath}`);
@@ -144,19 +143,24 @@ function generateClass(argv, ignoreOther) {
                         console.error('ERROR', 'An error occurred while validating destination path.');
                         return reject(err);
                     }
-                    writeFileFromTemplate(templateFile, destPath, model).then(() => {
-                        console.log('INFO', 'The operation was completed succesfully.');
+                    const data = {
+                        ...model
+                    };
+                    data.attributes = model.attributes;
+                    writeFileFromTemplate(templateFile, destPath, data).then(() => {
+                        console.log('INFO', 'The operation was completed successfully.');
                         if (ignoreOther) {
                             return resolve();
                         }
                         //add in-process class
                         argv.inProcClass.push(model.name);
                         let generateExtra = model.imports.filter((x)=> {
-                           return x.name !== "{DataObject}" && x.name !== model.name;
+                           return x.name !== "DataObject" && x.name !== model.name;
                         }).map((x)=> {
                             return generateClass(Object.assign({}, argv, {
-                                    "name": x.name,
-                                    "silent": true
+                                    'name': x.name,
+                                    'silent': true,
+                                    'force': false
                                 }));
                         });
                         Promise.all(generateExtra).then(()=> {
@@ -172,6 +176,8 @@ function generateClass(argv, ignoreOther) {
                         return reject(err);
                     });
                 });
+        }).then(() => {
+            return generateClassDefinitionHandler(argv);
         });
     });
 }
@@ -184,9 +190,11 @@ module.exports.desc = 'Generate a new data model class';
 
 module.exports.builder = function builder(yargs) {
     return yargs.option('silent', {
+        type: 'boolean',
         default: false,
         describe: 'disable errors'
     }).option('force', {
+        type: 'boolean',
         default: false,
         describe: 'replace if exists'
     });

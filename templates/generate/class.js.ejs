@@ -1,9 +1,7 @@
-import {EdmMapping, DataObject} from '@themost/data';
-<% if (inherits) { %>let <%-inherits%> = require('<%-inheritsClassPath%>');<% }%>
+ <% imports.forEach(function(x) { %>import {<%-x.name%>} from '<%-x.from%>';
+ <% }) %>
 /**
  * @class
- <% attributes.filter(function(x) { return x.model === name; }).forEach(function(x) { %>
- * @property {<%-x.typeName%>} <%-x.property || x.name%><% }) %>
  */
 @EdmMapping.entityType('<%-name%>')
 class <%-name%> extends <%-inherits ? inherits : "DataObject"%> {

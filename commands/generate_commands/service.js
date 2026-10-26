@@ -20,9 +20,9 @@ module.exports.handler = function handler(argv) {
         return process.exit(1);
     }
     //get service name
-    let serviceName = /service$/i.test(argv.name) ? _.upperFirst(_.camelCase(argv.name)) : _.upperFirst(_.camelCase(argv.name.concat('-service')));
+    let serviceName = argv.name;
     //get service file name
-    let destFile = _.dasherize(serviceName).concat(options.mode==='typescript' ? '.ts': '.js');
+    let destFile = serviceName.concat(options.mode==='typescript' ? '.ts': '.js');
     console.log('INFO',`Generating service ${destFile}`);
     let destPath = path.resolve(process.cwd(), options.base, `services/${destFile}`);
     console.log('INFO',`Validating service path ${destPath}`);
@@ -35,23 +35,23 @@ module.exports.handler = function handler(argv) {
     
     //get destination folder path
     let destFolder = path.dirname(destPath);
-    console.error('INFO', 'LISTENER', `Validating service folder (${destFolder}).`);
+    console.error('INFO', 'SERVICE', `Validating service folder (${destFolder}).`);
     try {
         fs.ensureDirSync(destFolder);
     }
     catch (err) {
-        console.error('ERROR', 'LISTENER', 'An error occurred while validating destination path.');
+        console.error('ERROR', 'SERVICE', 'An error occurred while validating destination path.');
         console.error(err);
         return process.exit(1);
     }
-    console.log('INFO', 'LISTENER', `Generate service from template`);
+    console.log('INFO', 'SERVICE', `Generate service from template`);
     return writeFileFromTemplate(templateFile, destPath, {
         name:serviceName
     }).then(()=> {
-        console.log('INFO', 'LISTENER', 'The operation was completed succesfully.');
+        console.log('INFO', 'SERVICE', 'The operation was completed succesfully.');
         return process.exit(0);
     }).catch((err)=> {
-        console.error('ERROR', 'LISTENER', 'An error occurred while generating service.');
+        console.error('ERROR', 'SERVICE', 'An error occurred while generating service.');
         console.error(err);
         return process.exit(1);
     });

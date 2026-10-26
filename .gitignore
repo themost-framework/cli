@@ -65,6 +65,7 @@ typings/
 
 # application
 tests/
+.tmp/
 
 # idea
 .vscode

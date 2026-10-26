@@ -20,10 +20,10 @@ module.exports.handler = function handler(argv) {
         return process.exit(1);
     }
     //get service name
-    let listenerName = /listener$/i.test(argv.name) ? _.upperFirst(_.camelCase(argv.name)) : _.upperFirst(_.camelCase(argv.name.concat('-listener')));
+    let listenerName = argv.name;
     
     //get listener file name
-    let destFile = _.dasherize(listenerName).concat(options.mode==='typescript' ? '.ts': '.js');
+    let destFile = listenerName.concat(options.mode==='typescript' ? '.ts': '.js');
     console.log('INFO',`Generating listener ${destFile}`);
     let destPath = path.resolve(process.cwd(), options.base, `listeners/${destFile}`);
     console.log('INFO',`Validating listener path ${destPath}`);
@@ -42,7 +42,7 @@ module.exports.handler = function handler(argv) {
            console.error(err);
     }).then(() => {
        return writeFileFromTemplate(templateFile, destPath, {
-            name:_.upperFirst(_.camelCase(argv.name))
+            name: argv.name
         }).then(()=> {
             console.log('INFO','The operation was completed succesfully.');
               return process.exit(0);

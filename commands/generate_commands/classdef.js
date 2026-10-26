@@ -18,14 +18,12 @@ function generateAnyDefinition(argv) {
     let builder = getBuilder(config);
     let sources = [];
     return builder.getEdm().then((schema)=> {
-        console.log('INFO', argv);
         if (argv.name === 'app' || argv.name === '*') {
             sources = schema.entityType.map((x)=> {
                 return generateDefinition(Object.assign({
                     inProcDefinition:[]
                 }, argv, {
-                    "name": x.name,
-                    "silent": true
+                    "name": x.name
                 }), true);
             });
         }
@@ -76,9 +74,9 @@ function generateDefinition(argv, ignoreOther) {
             let model = context.model(argv.name) || emptyModel;
             model.inherits = model.inherits || null; 
             model.imports = [];
-            model.modulePath = _.dasherize(model.name).concat('-model');
+            model.modulePath = model.inherits;
             if (model.inherits) {
-                model.inheritsClassPath = "./".concat(_.dasherize(model.inherits).concat('-model'));
+                model.inheritsClassPath = "./".concat(model.inherits);
                 model.imports.push({
                   "name": model.inherits,
                   "from": model.inheritsClassPath
@@ -86,8 +84,8 @@ function generateDefinition(argv, ignoreOther) {
             }
             else {
                 model.imports.push({
-                  "name": "{DataObject}",
-                  "from": "@themost/data/data-object"
+                  "name": "DataObject",
+                  "from": "@themost/data"
                 });
             }
             model.attributes.forEach((x)=> {
@@ -107,10 +105,10 @@ function generateDefinition(argv, ignoreOther) {
                         if (typeof model.imports.find((x)=> { return x.name === importModel.name }) === 'undefined') {
                             model.imports.push({
                                 "name": importModel.name,
-                                "from": "./".concat(_.dasherize(importModel.name).concat('-model'))
+                                "from": "./".concat(importModel.name)
                             });    
                         }
-                        x.typeName = x.many ?  "Array<" + x.type + "|any>" : x.type + "|any";
+                        x.typeName = x.many ?  "Array<any>" : "any";
                         return;
                     }    
                 }
@@ -119,10 +117,10 @@ function generateDefinition(argv, ignoreOther) {
                     return;
                 }
                 
-                x.typeName = x.many ?  "Array<" + x.type + ">" : x.type;
+                x.typeName = x.many ?  "Array<any>" : "any";
             });
             //get file name
-            let destFile = _.dasherize(argv.name).concat('-model.d.ts');
+            let destFile = argv.name.concat('.d.ts');
             console.log('INFO', `Generating class ${destFile}`);
             let destPath = path.resolve(process.cwd(), options.base, `models/${destFile}`);
             console.log('INFO', `Validating class path ${destPath}`);
@@ -144,7 +142,11 @@ function generateDefinition(argv, ignoreOther) {
                     console.error('ERROR', 'An error occurred while validating destination path.');
                     return reject(err);
                 }
-                writeFileFromTemplate(templateFile, destPath, model).then(() => {
+                const data = {
+                    ...model
+                };
+                data.attributes = model.attributes;
+                writeFileFromTemplate(templateFile, destPath, data).then(() => {
                     console.log('INFO', 'The operation was completed succesfully.');
                     if (ignoreOther) {
                         return resolve();
@@ -152,11 +154,12 @@ function generateDefinition(argv, ignoreOther) {
                     //add in-process class
                     argv.inProcDefinition.push(model.name);
                     let generateExtra = model.imports.filter((x)=> {
-                        return x.name !== "{DataObject}" && x.name !== model.name;
+                        return x.name !== "DataObject" && x.name !== model.name;
                     }).map((x)=> {
                         return generateDefinition(Object.assign({}, argv, {
                             "name": x.name,
-                            "silent": true
+                            "silent": true,
+                            "force": false
                         }));
                     });
                     Promise.all(generateExtra).then(()=> {
