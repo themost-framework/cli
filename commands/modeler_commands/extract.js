@@ -1,6 +1,6 @@
 // MOST Web Framework Copyright (c) 2017-2022, THEMOST LP All rights reserved
 const generateModel = require('../../modeler/modeler').generateModel;
-const getConfiguration = require('../../util').getConfiguration;
+const {getConfiguration, createLogger} = require('../../util');
 const path = require('path');
 
 module.exports.command = 'extract <model> [options]';
@@ -14,6 +14,7 @@ module.exports.builder = function builder(yargs) {
 module.exports.handler = function (argv) {
     // get options
     let options = getConfiguration();
+    const logger = createLogger();
     // get output directory
     let outDir = path.resolve(process.cwd(), options.base, 'config/models/');
     // generate model
@@ -23,11 +24,10 @@ module.exports.handler = function (argv) {
         generateModel('Permission', outDir)
     ]
     return Promise.all(sources).then(()=> {
-        console.log('INFO', 'EXTRACT', 'The operation was completed successfully.');
-        return process.exit(0);
+        logger.info('The operation was completed successfully.');
+        return Promise.resolve();
     }).catch((err)=> {
-        console.log('ERROR', 'EXTRACT', 'An error occurred while extracting model.');
-        console.error(err);
-        return process.exit(1);
+        logger.error('An error occurred while extracting model.');
+        return Promise.reject(err);
     });
 }

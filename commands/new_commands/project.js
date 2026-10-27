@@ -1,6 +1,7 @@
 // MOST Web Framework Copyright (c) 2017-2022, THEMOST LP All rights reserved
 const path = require('path');
 const crypto = require('crypto');
+const { createLogger } = require('../../util');
 const existsSync = require('fs-extra').existsSync;
 const readdirSync = require('fs-extra').readdirSync;
 const copy = require('fs-extra').copy;
@@ -33,12 +34,13 @@ module.exports.builder = function builder(yargs) {
  * @returns {*}
  */
 module.exports.handler = function handler(argv) {
+    const logger = createLogger();
     let projectRoot = path.resolve(process.cwd(), argv.directory);
     if (existsSync(projectRoot) && readdirSync(projectRoot).length>0) {
-        console.error('ERROR: Project root directory must be empty.');
-        return process.exit(1);
+        logger.warn('Project root directory must be empty. Skipping project creation.');
+        return Promise.resolve();
     }
-    console.log('Creating new project  at %s', projectRoot);
+    logger.info('Creating new project  at %s', projectRoot);
     //get template path
     let  templateRoot = path.resolve(__dirname, `../../templates/${argv.template}_project`);
     if (argv.typescript) {
@@ -47,24 +49,22 @@ module.exports.handler = function handler(argv) {
 
     //validate template folder
     if (!existsSync(templateRoot)) {
-        console.error('ERROR: The specified template cannot be found.');
-        return process.exit(1);
+        logger.error('The specified template cannot be found.');
+        return Promise.reject(new Error('The specified template cannot be found.'));
     }
     return copy(templateRoot, projectRoot).then(() => {
             return Promise.all([
                 updateApplicationConfiguration(argv)
                 ]).then(()=> {
-                    console.log('Operation was completed successfully');
-                    return process.exit(0);
-                }).catch(err => {
-                    console.error('ERROR: An error occurred while executing post operations.');
-                    console.error(err);
-                    return process.exit(1);
+                    logger.log(`The operation was completed successfully. A new project was created at ${projectRoot}`);
+                    return Promise.resolve();
+                }).catch((err) => {
+                    logger.error('An error occurred while executing post operations.');
+                    return Promise.reject(err);
                 });
         }, err => {
-            console.error('ERROR: An error occurred while generating new project.');
-            console.error(err);
-            return process.exit(1);
+            logger.error('An error occurred while generating new project.', err);
+            return Promise.reject(err);
         });
 
 };
@@ -79,18 +79,21 @@ function updateApplicationConfiguration(argv) {
                if (err) {
                    return reject(err);
                } 
-               let data = JSON.parse(str);
+               // noinspection JSCheckFunctionSignatures
+                let data = JSON.parse(str);
                return crypto.randomBytes(48, (err, buffer) => {
                    if (err) {
                        return reject(err);
                    }
                    // set application key
-                  data.settings.crypto.key = buffer.toString('hex');
+                  // noinspection JSCheckFunctionSignatures
+                   data.settings.crypto.key = buffer.toString('hex');
                   return crypto.randomBytes(12, (err, buffer) => {
                        if (err) {
                            return reject(err);
                        }
                        // set unattended execution account
+                      // noinspection JSCheckFunctionSignatures
                       data.settings.auth.unattendedExecutionAccount = buffer.toString('base64');
                       // write app.json
                       return writeFile(appJsonPath, JSON.stringify(data, null, 4), 'utf8', (err) => {

@@ -95,7 +95,7 @@ function generateDefinition(argv, ignoreOther) {
                     x.typeName = x.many ?  "Array<*>" : "*";
                     return;
                 }
-                if (!x.hasOwnProperty('nullable')) {
+                if (!Object.prototype.hasOwnProperty.call(x, 'nullable')) {
                     x.nullable = true;
                 }
                 //add import
@@ -125,12 +125,8 @@ function generateDefinition(argv, ignoreOther) {
             let destPath = path.resolve(process.cwd(), options.base, `models/${destFile}`);
             console.log('INFO', `Validating class path ${destPath}`);
             if (fs.existsSync(destPath) && !argv.force) {
-                if (argv.silent) {
-                    console.error('WARNING', `The specified class [${argv.name}] already exists.`);
-                    return resolve();
-                }
-                console.error('ERROR', 'An error occurred while validating class definition.');
-                return reject(new Error('The specified class already exists.'));
+                console.warn('WARNING', `The specified class definition "${argv.name}" already exists. Skipping generation.`);
+                return resolve();
             }
             //get template file path
             let templateFile = path.resolve(__dirname, '../../templates/generate/classdef.d.ts.ejs');
@@ -195,10 +191,5 @@ module.exports.builder = function builder(yargs) {
 };
 
 module.exports.handler =  function handler(argv) {
-    return generateAnyDefinition(argv).then(() => {
-        return process.exit(0);
-    }).catch((err) => {
-        console.error(err);
-        return process.exit(1);
-    });
+    return generateAnyDefinition(argv);
 };

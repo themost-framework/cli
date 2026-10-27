@@ -1,9 +1,6 @@
-// MOST Web Framework Copyright (c) 2017-2022, THEMOST LP All rights reserved
-const contentFromTemplate = require('../../util').contentFromTemplate;
-const getConfiguration = require('../../util').getConfiguration;
+const {contentFromTemplate, getConfiguration, createLogger} = require('../../util');
 const fs = require('fs-extra');
 const path = require('path');
-const _ = require('lodash');
 const pluralize = require('pluralize');
 
 module.exports.command = 'model <name>';
@@ -19,39 +16,34 @@ module.exports.builder = function builder(yargs) {
 };
 
 module.exports.handler = function handler(argv) {
-    let options = getConfiguration();
-    // validating name
-    if (!/^[a-zA-Z0-9_]+$/.test(argv.name)) {
-        console.error('ERROR','Model name is not valid. Expected only latin characters, numbers or "_" character.');
-        return process.exit(1);
-    }
+    const options = getConfiguration();
+    const logger = createLogger();
     // get file name
-    let destFile = argv.name.concat('.json');
-    console.log('INFO',`Generating model ${argv.name}`);
+    const destFile = argv.name.concat('.json');
     let destPath = path.resolve(process.cwd(), options.base, `config/models/${destFile}`);
-    console.log('INFO',`Validating model path ${destPath}`);
     if (fs.existsSync(destPath)) {
-        console.error('ERROR','The specified model already exists.');
-        return process.exit(1);
+        logger.warn('The specified model already exists');
+        return Promise.resolve();
     }
     // read template
     let templateFile = path.resolve(__dirname,'../../templates/generate/model.json.ejs');
-    console.log('INFO', 'MODEL', `Generate model from template`);
-    const data = _.assign({ }, argv, {
+    const data = Object.assign({}, argv, {
         title: pluralize.plural(argv.name)
     });
-    return contentFromTemplate(templateFile, data).then( str => {
+    return contentFromTemplate(templateFile, data).then((str) => {
+        // noinspection JSCheckFunctionSignatures
         const model = JSON.parse(str);
         if (model.inherits || model.implements) {
             // clear fields
             model.fields.splice(0, model.fields.length);
         }
         fs.writeFileSync(destPath, JSON.stringify(model, null, 4));
-        console.log('INFO', 'MODEL', 'The operation was completed succesfully.');
-        return process.exit(0);
+        return Promise.resolve();
+    }).then(() => {
+        logger.info(`The model "${argv.name}" generated successfully at ${path.relative(process.cwd(), destPath)}`);
+        return Promise.resolve();
     }).catch((err)=> {
-        console.error('ERROR', 'LISTENER', 'An error occurred while generating model.');
-        console.error(err);
-        return process.exit(1);
+        logger.error('An error occurred while generating model');
+        return Promise.reject(err);
     });
 };

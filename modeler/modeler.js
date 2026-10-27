@@ -16,9 +16,9 @@ const subClassProperty = "rdfs:subClassOf";
 const domainIncludesProperty = "http://schema.org/domainIncludes";
 const rangeIncludesProperty = "http://schema.org/rangeIncludes";
 
-const DEFAULT_SCHEMA = JSON.parse(fs.readFileSync(path.resolve(__dirname,'schemas/schema.jsonld')));
-const THEMOST_SCHEMA = JSON.parse(fs.readFileSync(path.resolve(__dirname,'schemas/themost.jsonld')));
-const XMLSCHEMA_SCHEMA = JSON.parse(fs.readFileSync(path.resolve(__dirname,'schemas/xmlschema.jsonld')));
+const DEFAULT_SCHEMA = JSON.parse(fs.readFileSync(path.resolve(__dirname,'schemas/schema.jsonld'), 'utf8'));
+const THEMOST_SCHEMA = JSON.parse(fs.readFileSync(path.resolve(__dirname,'schemas/themost.jsonld'), 'utf8'));
+const XMLSCHEMA_SCHEMA = JSON.parse(fs.readFileSync(path.resolve(__dirname,'schemas/xmlschema.jsonld'), 'utf8'));
 
 DEFAULT_SCHEMA[graphProperty].push.apply(DEFAULT_SCHEMA[graphProperty], XMLSCHEMA_SCHEMA[graphProperty]);
 DEFAULT_SCHEMA[graphProperty].push.apply(DEFAULT_SCHEMA[graphProperty], THEMOST_SCHEMA[graphProperty]);
@@ -338,16 +338,14 @@ class ModelGenerator {
             // }));
 
             Object.keys(finalDefinition).forEach((key)=> {
-                if (finalDefinition.hasOwnProperty(key) && finalDefinition[key] === null) {
+                if (Object.prototype.hasOwnProperty.call(finalDefinition, key) && finalDefinition[key] === null) {
                     delete finalDefinition[key];
                 }
             });
 
             return Promise.resolve(finalDefinition);
         });
-
-
-    };
+    }
 
     /**
      * @param file

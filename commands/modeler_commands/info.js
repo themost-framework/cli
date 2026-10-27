@@ -1,6 +1,6 @@
 // MOST Web Framework Copyright (c) 2017-2022, THEMOST LP All rights reserved
 const ModelGenerator = require('../../modeler/modeler').ModelGenerator;
-const getConfiguration = require('../../util').getConfiguration;
+const {getConfiguration, createLogger} = require('../../util');
 const path = require('path');
 const Table = require('easy-table');
 const _ = require('lodash');
@@ -17,6 +17,7 @@ module.exports.builder = function builder(yargs) {
 module.exports.handler = function (argv) {
     // get options
     let options = getConfiguration();
+    const logger = createLogger();
     // get output directory
     let outDir = path.resolve(process.cwd(), options.base, 'config/models/');
     const generator = new ModelGenerator();
@@ -66,8 +67,8 @@ module.exports.handler = function (argv) {
     
         return generator.getModel(argv.model).then( function(model) {
             if (model == null) {
-                console.log('INFO','The specifiec model cannot be found.');
-                return;
+                logger.info('The specified model cannot be found.');
+                return Promise.resolve();
             }
             // print model attributes
             console.log('');

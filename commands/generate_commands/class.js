@@ -1,8 +1,5 @@
-const writeFileFromTemplate = require('../../util').writeFileFromTemplate;
-const getConfiguration = require('../../util').getConfiguration;
-const SimpleDataContext = require('../../util').SimpleDataContext;
-const getBuilder = require('../../util').getBuilder;
-const getDataConfiguration = require('../../util').getDataConfiguration;
+const {writeFileFromTemplate, getConfiguration, SimpleDataContext,
+    getBuilder, getDataConfiguration, createLogger} = require('../../util');
 const fs = require('fs-extra');
 const path = require('path');
 const _ = require('lodash');
@@ -10,7 +7,6 @@ const generateClassDefinitionHandler = require('./classdef').handler;
 
 
 function generateAnyClass(argv) {
-    
     //get cli options
     let options = getConfiguration();
     //get data configuration
@@ -46,13 +42,14 @@ module.exports.generateAnyClass = generateAnyClass;
 
 function generateClass(argv, ignoreOther) {
     return new Promise((resolve, reject) => {
+        const logger = createLogger();
         //get cli options
         let options = getConfiguration();
         //get data configuration
         let config = getDataConfiguration(options);
         //validating name
         if (!/^[a-zA-Z0-9_-]+$/.test(argv.name)) {
-            console.error('ERROR', 'An error occurred while validating class name.');
+            logger.error('An error occurred while validating class name.');
             return reject(new Error('Class name is not valid. Expected only Latin characters, numbers or "_,-" characters.'));
         }
         //--
@@ -76,8 +73,6 @@ function generateClass(argv, ignoreOther) {
                 model.inherits = model.inherits || null; 
                 model.imports = [];
                 if (model.inherits) {
-                    const inheritedModel = context.model(model.inherits);
-                    const InheritedModelClass = inheritedModel.getDataObjectType();
                     model.inheritsClassPath = './'.concat(model.inherits);
                     model.imports.push({
                       "name": model.inherits,
@@ -97,7 +92,7 @@ function generateClass(argv, ignoreOther) {
                         x.typeName = x.many ?  "Array<*>" : "*";
                         return;
                     }
-                    if (!x.hasOwnProperty('nullable')) {
+                    if (!Object.prototype.hasOwnProperty.call(x, 'nullable')) {
                         x.nullable = true;
                     }
                     //add import
@@ -122,25 +117,21 @@ function generateClass(argv, ignoreOther) {
                 });
                 //get file name
                 let destFile = model.name.concat(options.mode==='typescript' ? '.ts': '.js');
-                console.log('INFO', `Generating class ${destFile}`);
+                logger.info(`Generating class ${destFile}`);
                 let destPath = path.resolve(process.cwd(), options.base, `models/${destFile}`);
-                console.log('INFO', `Validating class path ${destPath}`);
+                logger.info(`Validating class path ${destPath}`);
                 if (fs.existsSync(destPath) && !argv.force) {
-                    if (argv.silent) {
-                        console.error('WARNING', `The specified class [${argv.name}] already exists.`);
-                        return resolve();
-                    }
-                    console.error('ERROR', 'An error occurred while validating class.');
-                    return reject(new Error('The specified class already exists.'));
+                    logger.warn(`The specified class "${argv.name}" already exists.Skipping class generation.`);
+                    return resolve();
                 }
                 //get template file path
                 let templateFile = path.resolve(__dirname, '../../templates/generate/class'+(options.mode==='typescript' ? '.ts': '.js')+'.ejs');
                 //get destination folder path
                 let destFolder = path.dirname(destPath);
-                console.error('INFO', `Validating class folder (${destFolder}).`);
-                fs.ensureDir(destFolder, (err) => {
+                logger.info(`Validating class folder (${destFolder}).`);
+                void fs.ensureDir(destFolder, (err) => {
                     if (err) {
-                        console.error('ERROR', 'An error occurred while validating destination path.');
+                        logger.error('An error occurred while validating destination path.');
                         return reject(err);
                     }
                     const data = {
@@ -148,7 +139,7 @@ function generateClass(argv, ignoreOther) {
                     };
                     data.attributes = model.attributes;
                     writeFileFromTemplate(templateFile, destPath, data).then(() => {
-                        console.log('INFO', 'The operation was completed successfully.');
+                        logger.info('The operation was completed successfully.');
                         if (ignoreOther) {
                             return resolve();
                         }
@@ -172,12 +163,14 @@ function generateClass(argv, ignoreOther) {
                             return reject(err);
                         });
                     }).catch((err) => {
-                        console.error('ERROR', 'An error occurred while generating data model class.');
+                        logger.error('An error occurred while generating data model class.');
                         return reject(err);
                     });
                 });
         }).then(() => {
             return generateClassDefinitionHandler(argv);
+        }).catch((err) => {
+            return reject(err);
         });
     });
 }
@@ -201,10 +194,5 @@ module.exports.builder = function builder(yargs) {
 };
 
 module.exports.handler = function handler(argv) {
-    return generateAnyClass(argv).then(() => {
-        return process.exit(0);
-    }).catch((err) => {
-        console.error(err);
-        return process.exit(1);
-    });
+    return generateAnyClass(argv);
 };

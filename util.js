@@ -10,6 +10,7 @@ const _ = require('lodash');
 const ejs = require('ejs');
 const fs = require('fs-extra');
 const path = require('path');
+const {TraceUtils} = require('@themost/common');
 
 const configurationDefaults = {
     "base":"server",
@@ -72,13 +73,11 @@ function getConfiguration() {
     catch(err) {
         if (err.code === 'MODULE_NOT_FOUND') {
             console.error('ERROR','Configuration cannot be found. It seems that current working directory does not contain a MOST Web Framework project.');
-            return process.exit(1);
         }
         else {
             console.error('ERROR','An error occurred while loading configuration.');
-            console.error(err);
-            return process.exit(1);
         }
+        throw err;
     }
 }
 
@@ -136,9 +135,8 @@ module.exports.getDataConfiguration = function getDataConfiguration(options) {
         }
         else {
             console.error('ERROR','An error occurred while trying to initialize data configuration.');
-            console.error(err);
         }
-        return process.exit(1);
+        throw err;
     }
     console.log('INFO','Initializing configuration');
     let res = new DataConfiguration(path.resolve(process.cwd(), options.base, 'config'));
@@ -173,7 +171,7 @@ module.exports.getBuilder = function getBuilder(config) {
         paths:[path.resolve(process.cwd(), 'node_modules')]
     });
     //disable data model class loader
-    config.getStrategy(function ModelClassLoaderStrategy() {}).resolve = function(model) {
+    config.getStrategy(function ModelClassLoaderStrategy() {}).resolve = function() {
         // noinspection JSUnresolvedReference
         return require(dataObjectModule).DataObject;
     };
@@ -217,6 +215,7 @@ function createApplication(options) {
         return customModule(path.resolve(process.cwd(), options.out));
     }
     try {
+        // eslint-disable-next-line node/no-missing-require
         const applicationModule = require.resolve('@themost/express',{
             paths:[
                 path.resolve(process.cwd(), 'node_modules')
@@ -233,10 +232,21 @@ function createApplication(options) {
             console.error('ERROR','An error occurred while trying to initialize MOST Web Framework Application.');
             console.error(err);
         }
-        return process.exit(1);
+        throw err;
     }
     console.log('INFO','Initializing application');
     return new ApplicationClassOrFunction(path.resolve(process.cwd(), options.out, 'config'));
+}
+
+module.exports.createLogger = function createLogger() {
+    if (typeof TraceUtils.newLogger === 'function') {
+        return TraceUtils.newLogger();
+    }
+    // get first symbol property of TraceUtils
+    const traceLoggerSymbol = Object.getOwnPropertySymbols(TraceUtils).find((s) => s.toString() === 'Symbol(logger)');
+    if (traceLoggerSymbol) {
+        return Object.create(TraceUtils[traceLoggerSymbol]);
+    }
 }
 
 module.exports.createApplication = createApplication;

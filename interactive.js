@@ -82,9 +82,8 @@ function stripInteractive(args) {
 /**
  * Creates a command line parser which does not exit process
  * @param {function(Error=)} done
- * @param {function()} started
  */
-function createParser(done, started) {
+function createParser(done) {
     return Yargs()
         .scriptName('themost')
         .commandDir(path.resolve(__dirname, 'commands'))
@@ -93,8 +92,6 @@ function createParser(done, started) {
         .help()
         .version(false)
         .exitProcess(false)
-        .middleware(() => started())
-        .onFinishCommand(() => done())
         .fail((msg, err) => {
             done(err || new Error(msg));
             // stop executing command handler after a validation error
@@ -154,7 +151,6 @@ function startInteractive(initialArgs) {
 
     const runCommand = (args) => {
         return new Promise((resolve) => {
-            let isStarted = false;
             const command = current = {
                 finish: (err, exited) => {
                     if (current !== command) {
@@ -168,24 +164,27 @@ function startInteractive(initialArgs) {
                     return resolve();
                 }
             };
+            let result;
             parsing = true;
             try {
-                createParser((err) => command.finish(err), () => isStarted = true).parse(args);
+                // yargs@17 returns a promise when the command handler is async
+                result = createParser((err) => command.finish(err)).parse(args);
             }
             catch(err) {
-                return command.finish(err);
+                return command.finish(err instanceof ExitSignal ? null : err);
             }
             finally {
                 parsing = false;
             }
-            if (!isStarted) {
-                // help or validation output; no command handler was executed
-                command.finish();
-            }
+            return Promise.resolve(result).then(() => {
+                return command.finish();
+            }, (err) => {
+                return command.finish(err instanceof ExitSignal ? null : err);
+            });
         });
     };
 
-    const commands = createParser(() => {}, () => {}).getCommandInstance().getCommands();
+    const commands = createParser(() => {}).getInternalMethods().getCommandInstance().getCommands();
     const keywords = ['help', 'exit'].concat(commands);
     console.log('Type a command e.g. cat User --top 1, "help" for available commands or "exit" to quit.');
     const startRepl = () => {
