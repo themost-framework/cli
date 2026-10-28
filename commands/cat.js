@@ -1,6 +1,5 @@
 // MOST Web Framework Copyright (c) 2017-2022, THEMOST LP All rights reserved
-const getConfiguration = require('../util').getConfiguration;
-const getApplication = require('../util').getApplication;
+const {getConfiguration, getApplication, createLogger} = require('../util');
 const isInteractiveSession = require('../interactive').isInteractiveSession;
 const fs = require('fs-extra');
 const path = require('path');
@@ -163,9 +162,9 @@ function executeQuery(app, argv) {
 
 module.exports.handler = function handler(argv) {
     let options = getConfiguration();
+    const logger = createLogger();
     if ((typeof argv.model === 'undefined' || argv.model === null)) {
-        console.error('ERROR','The target cannot be empty');
-        return process.exit(1);
+        return Promise.reject(new Error('The target cannot be empty'));
     }
     if (argv.configuration === 'development') {
         //set development mode
@@ -176,10 +175,9 @@ module.exports.handler = function handler(argv) {
     });
     let app = getApplication(options);
     return executeQuery(app, argv).then(() => {
-        return process.exit(0);
+        return Promise.resolve();
     }).catch((err) => {
-        console.error('ERROR','An error occurred while querying data.');
-        console.error(err);
-        return process.exit(1);
+        logger.error('An error occurred while querying data.');
+        return Promise.reject(err);
     });
 };

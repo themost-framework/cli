@@ -105,6 +105,7 @@ module.exports.implementsStructuredValueFormatter = function(model) {
             idField.type = "Integer";
         }
         model.implements = "Intangible";
+        model.hidden = true;
     }
 };
 
@@ -122,4 +123,10 @@ module.exports.trimPluralizedPropertyFormatter = function(model) {
             }
         }
     });
+};
+
+module.exports.inheritsStructuredValueFormatter = function(model) {
+    if (model.inherits === 'StructuredValue') {
+        model.hidden = true;
+    }
 };

@@ -1,5 +1,5 @@
 // MOST Web Framework Copyright (c) 2017-2022, THEMOST LP All rights reserved
-const ModelGenerator = require('../../modeler/modeler').ModelGenerator;
+const {ModelGenerator} = require('../../modeler/modeler');
 const {getConfiguration, createLogger} = require('../../util');
 const path = require('path');
 const Table = require('easy-table');
@@ -15,10 +15,8 @@ module.exports.builder = function builder(yargs) {
 
 module.exports.handler = function (argv) {
     // get options
-    const options = getConfiguration();
     const logger = createLogger();
     // get output directory
-    const outDir = path.resolve(process.cwd(), options.base, 'config/models/');
     const generator = new ModelGenerator();
     return generator.getList().then( function(list) {
         const res = _.map(list, function(x) {
@@ -39,7 +37,7 @@ module.exports.handler = function (argv) {
         }
         return Promise.resolve();
     }).catch((err) => {
-        logger.error('An error occurred while listing models.', err);
+        logger.error('An error occurred while listing models.');
         return Promise.reject(err);
     });
 }

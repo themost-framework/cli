@@ -2,9 +2,11 @@
 const fs = require('fs');
 const _ = require('lodash');
 const path = require('path');
-const XDocument = require('@themost/xml').XDocument;
-const DOMParser = require('@xmldom/xmldom').DOMParser;
+const {XDocument} = require('@themost/xml');
 const formatters = require('./formatters');
+const { parse } = require('node-html-parser');
+const { createLogger } = require('../util');
+require('@themost/promise-sequence');
 
 const formattersProperty = 'formatters';
 const labelProperty = "rdfs:label";
@@ -23,8 +25,13 @@ const XMLSCHEMA_SCHEMA = JSON.parse(fs.readFileSync(path.resolve(__dirname,'sche
 DEFAULT_SCHEMA[graphProperty].push.apply(DEFAULT_SCHEMA[graphProperty], XMLSCHEMA_SCHEMA[graphProperty]);
 DEFAULT_SCHEMA[graphProperty].push.apply(DEFAULT_SCHEMA[graphProperty], THEMOST_SCHEMA[graphProperty]);
 
-const XML_SCHEMA = "http://www.w3.org/2001/XMLSchema#";
+// const XML_SCHEMA = "http://www.w3.org/2001/XMLSchema#";
 
+function htmlToText(html) {
+  return parse(html).text.replace(/[ \t]+/g, ' ')
+    .replace(/\n\s*\n+/g, '')
+    .trim();
+}
 
 class SchemaLoader {
     getSchema() {
@@ -108,9 +115,9 @@ function extractModelInternal(name, outCollection) {
                     }
                     return true;
                 }).map((x)=> {
-                    return extractModelInternal.bind(self)(x,outCollection);
+                    return () => extractModelInternal.bind(self)(x,outCollection);
                 });
-                return Promise.all(other).then(()=> {
+                return Promise.sequence(other).then(()=> {
                     return Promise.resolve(outCollection);
                 });
             }
@@ -119,26 +126,67 @@ function extractModelInternal(name, outCollection) {
     });
 }
 
-module.exports.generateModel = function(model, outDir) {
+module.exports.generateOnlyModel = function(model, outDir) {
     let generator = new ModelGenerator();
+    const logger = createLogger();
     return generator.extractModel(model).then((source)=> {
         let sources = _.uniqBy(source, '@id').map((x)=> {
-            return new Promise(((resolve1, reject1) => {
+            return () => new Promise(((resolve1) => {
                 let modelPath = path.resolve(outDir, x.name.concat('.json'));
+                let isGenerated = false;
                 if (fs.existsSync(modelPath)) {
-                    console.log('INFO',`Model ${x.name} already exists.`);
-                    return resolve1();
+                    const str = fs.readFileSync(modelPath, 'utf-8');
+                    if (str.length) {
+                        const existingModel = JSON.parse(str);
+                        isGenerated = !!existingModel['@modeler.generated'];
+                        if (!isGenerated) {
+                            logger.debug(`Model "${x.name}" already exists. Skipping model creation`);
+                            return resolve1();
+                        } else {
+                            logger.info(`Model "${x.name}" is generated using @themost/cli. Overwriting existing model`);
+                        }
+                    }
+                }
+                return resolve1(x);
+            }));
+        });
+        return Promise.sequence(sources).then((results)=> {
+            return Promise.resolve(results.filter(x => x != null));
+        });
+    });
+}
+
+module.exports.generateModel = function(model, outDir) {
+    let generator = new ModelGenerator();
+    const logger = createLogger();
+    return generator.extractModel(model).then((source)=> {
+        let sources = _.uniqBy(source, '@id').map((x)=> {
+            return () => new Promise(((resolve1, reject1) => {
+                let modelPath = path.resolve(outDir, x.name.concat('.json'));
+                let isGenerated = false;
+                if (fs.existsSync(modelPath)) {
+                    const str = fs.readFileSync(modelPath, 'utf-8');
+                    if (str.length) {
+                        const existingModel = JSON.parse(str);
+                        isGenerated = !!existingModel['@modeler.generated'];
+                        if (!isGenerated) {
+                            logger.debug(`Model "${x.name}" already exists. Skipping model creation`);
+                            return resolve1();
+                        } else {
+                            logger.info(`Model "${x.name}" is generated using @themost/cli. Overwriting existing model`);
+                        }
+                    }
                 }
                 return fs.writeFile(modelPath, JSON.stringify(x, null, 4), (err)=> {
                     if (err) {
                         return reject1(err);
                     }
-                    console.log('INFO',`Model ${x.name} has been successfully created.`);
+                    logger.info(`Model "${x.name}" has been successfully created.`);
                     return resolve1();
                 });
             }));
         });
-        return Promise.all(sources);
+        return Promise.sequence(sources);
     });
 }
 
@@ -185,7 +233,8 @@ class ModelGenerator {
                 return x[typeProperty] === "rdfs:Class";
             });
             return Promise.resolve(_.map(definitions, function(x) {
-                const description = new DOMParser().parseFromString( '<div>' + x[commentProperty] + '</div>');
+                // parse the description as HTML to extract text content
+                const description = htmlToText(x[commentProperty]);
                 let subClassOfDefinition;
                 if (x[subClassProperty]) {
                     subClassOfDefinition = _.find(schema[graphProperty], function(y) {
@@ -194,7 +243,7 @@ class ModelGenerator {
                 }
                 const res = {
                     "name": x[labelProperty],
-                    "description": description.documentElement.textContent.replace(/\n/ig, '')
+                    "description": description
                 }
                 if (subClassOfDefinition) {
                     res.subClassOf = subClassOfDefinition[labelProperty]
@@ -246,9 +295,7 @@ class ModelGenerator {
 
             let comment = null;
             if (definition[commentProperty]) {
-                comment = new DOMParser()
-                    .parseFromString('<div>' + definition[commentProperty] + '</div>')
-                    .documentElement.textContent.replace(/\n/ig, '');
+                comment = htmlToText(definition[commentProperty]);
             }
 
             let finalDefinition = {
@@ -258,15 +305,16 @@ class ModelGenerator {
                 "title":definition[labelProperty],
                 "abstract": false,
                 "sealed":false,
+                "hidden": false,
                 "inherits": _.isNil(subClassOfDefinition) ? null : subClassOfDefinition[labelProperty],
                 "implements": null,
-                "version": "1.0",
+                "version": "1.0.0",
+                "@modeler.generated": true,
+                "@modeler.help": "This model was generated using @themost/cli. Remove @modeler.generated if you want to edit it manually.",
                 "fields":_.map(attributesDefinition, function(x) {
                     let comment = null;
                     if (x[commentProperty]) {
-                        comment = new DOMParser()
-                            .parseFromString('<div>' + x[commentProperty] + '</div>')
-                            .documentElement.textContent.replace(/\n/ig, '');
+                        comment = htmlToText(x[commentProperty]);
                     }
                     let res  = {
                         "@id": x[idProperty],
@@ -372,6 +420,7 @@ class ModelGenerator {
                         "@graph": []
                     };
 
+                    // eslint-disable-next-line no-unused-vars
                     let owl = document.documentElement.lookupPrefix('http://www.w3.org/2002/07/owl#');
                     document.documentElement.childNodes.forEach(
                         /**
