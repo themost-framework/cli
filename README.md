@@ -6,7 +6,7 @@ A command line utility for [Most Web Framework](https://github.com/themost-frame
 
 ### Generate a new MOST Web Framework application
 
-    themost new project <project name> [--template <api|express>] [--typescript]
+    npx @themost/cli new project <project name> [--template <api|express>] [--typescript]
 
 Note: Use --typescript flag if you want to generate a typescript project.
     
@@ -18,13 +18,13 @@ to install dependencies.
 
 ### Import data
 
-    themost import <data file path> --model <data model name> [--dev]
+    npx @themost/cli import <data file path> --model <data model name> [--dev]
     
 ### Query data
 
 Applies the specified OData query options against the defined data model and prints the result
 
-    themost cat --model <data model name> [--dev] 
+    npx @themost/cli cat --model <data model name> [--dev] 
             [--filter=<filter option>] 
             [--select=<select option>]
             [--top=<top option>] 
@@ -39,72 +39,74 @@ Applies the specified OData query options against the defined data model and pri
 Use `--interactive` (or `-i`) to start an interactive shell which executes any command against the same process,
 so the application instance is loaded once and shared across commands
 
-    themost -i
+    npx @themost/cli -i
 
 Each line accepts a command with its options e.g.
 
     themost> cat User --filter "name eq 'admin'" --select id,name --top 1
     themost> import data/users.json --model User
 
-A command passed together with `-i` is executed before prompting e.g. `themost cat User --top 1 -i`.
+A command passed together with `-i` is executed before prompting e.g. `npx @themost/cli cat User --top 1 -i`.
 Use `help` to print the available commands, `help <command>` for command options and `exit` (or `.exit`) to quit.
 
 ### User modeler
 
 Use modeler commands to manage data models:
 
-    themost modeler <command>
+    npx @themost/cli modeler <command>
 
 ### List data models
 
-    themost modeler ls
+    npx @themost/cli modeler ls
 
 Enumerates all the available data models
 
-### Get data model details
+### Inspect a data model
 
-    themost modeler info <model name>
+    npx @themost/cli modeler inspect <model name>
 
-Prints information about the given data model e.g.
+Prints the definition of the given data model, including its fields and the fields inherited from implemented models e.g.
 
-    themost modeler info UpdateAction
+    npx @themost/cli modeler inspect UpdateAction
+
+`npx @themost/cli modeler info <model name>` is an alias of `inspect` and is deprecated.
 
 ### Extract a data model
 
-    themost modeler extract <model name>
+    npx @themost/cli modeler extract <model name>
 
 e.g. 
 
-    themost modeler extract Article
+    npx @themost/cli modeler extract Article
 
 Extract a data model definition and its dependencies. There is a large set of data model definitions
 as they are defined and documented at [schema.org](https://schema.org) 
 
 ### Create an new controller
 
-    themost generate controller <controller name>
+    npx @themost/cli generate controller <controller name>
 
 This operation will generate a new controller and it will place it in controllers folder (server/controllers).
 ### Create an new model
 
-    themost generate model <model name>
+    npx @themost/cli generate model <model name>
 
 This operation will generate a new model and it will place it in models definition folder (server/config/models).
 
 ### Create an new model class
 
-    themost generate class <model name>
+    npx @themost/cli generate class <model name>
 
 This operation will generate a new model class and it will place it in models folder (server/models).
 
 ### Create an new model listener
 
-    themost generate listener <listener name>
+    npx @themost/cli generate listener <listener name>
 
 This operation will generate a new model listener and it will place it in listeners folder (server/listeners).
 
 ### Create an new application service
 
-    themost generate service <service name>
+    npx @themost/cli generate service <service name>
 
 This operation will generate a new application service and it will place it in services folder (server/services).
