@@ -4,7 +4,7 @@ const _ = require('lodash');
 const path = require('path');
 const {XDocument} = require('@themost/xml');
 const formatters = require('./formatters');
-const { parse } = require('node-html-parser');
+const { htmlToText } = require('./htmlToText');
 const { createLogger } = require('../util');
 require('@themost/promise-sequence');
 
@@ -15,8 +15,8 @@ const graphProperty = "@graph";
 const typeProperty = "@type";
 const idProperty = "@id";
 const subClassProperty = "rdfs:subClassOf";
-const domainIncludesProperty = "http://schema.org/domainIncludes";
-const rangeIncludesProperty = "http://schema.org/rangeIncludes";
+const domainIncludesProperty = "schema:domainIncludes";
+const rangeIncludesProperty = "schema:rangeIncludes";
 
 const DEFAULT_SCHEMA = JSON.parse(fs.readFileSync(path.resolve(__dirname,'schemas/schema.jsonld'), 'utf8'));
 const THEMOST_SCHEMA = JSON.parse(fs.readFileSync(path.resolve(__dirname,'schemas/themost.jsonld'), 'utf8'));
@@ -26,12 +26,6 @@ DEFAULT_SCHEMA[graphProperty].push.apply(DEFAULT_SCHEMA[graphProperty], XMLSCHEM
 DEFAULT_SCHEMA[graphProperty].push.apply(DEFAULT_SCHEMA[graphProperty], THEMOST_SCHEMA[graphProperty]);
 
 // const XML_SCHEMA = "http://www.w3.org/2001/XMLSchema#";
-
-function htmlToText(html) {
-  return parse(html).text.replace(/[ \t]+/g, ' ')
-    .replace(/\n\s*\n+/g, '')
-    .trim();
-}
 
 class SchemaLoader {
     getSchema() {
@@ -49,10 +43,10 @@ function isRdfsClass(schema, name) {
         return false;
     }
     //check if class is a data type
-    if (Array.isArray(rdfsClass["@type"]) && rdfsClass["@type"].indexOf("http://schema.org/DataType")>=0) {
+    if (Array.isArray(rdfsClass["@type"]) && rdfsClass["@type"].indexOf("schema:DataType")>=0) {
         return false;
     }
-    if (typeof rdfsClass["@type"] === 'string' && rdfsClass["@type"]==="http://schema.org/DataType") {
+    if (typeof rdfsClass["@type"] === 'string' && rdfsClass["@type"]==="schema:DataType") {
         return false;
     }
     if (typeof rdfsClass["rdfs:subClassOf"] === 'object') {
@@ -61,13 +55,17 @@ function isRdfsClass(schema, name) {
         });
         if (superRdfsClass) {
             //check if class is a data type
-            if (Array.isArray(superRdfsClass["@type"]) && superRdfsClass["@type"].indexOf("http://schema.org/DataType")>=0) {
+            if (Array.isArray(superRdfsClass["@type"]) && superRdfsClass["@type"].indexOf("schema:DataType")>=0) {
                 return false;
             }
-            if (typeof superRdfsClass["@type"] === 'string' && superRdfsClass["@type"]==="http://schema.org/DataType") {
+            if (typeof superRdfsClass["@type"] === 'string' && superRdfsClass["@type"]==="schema:DataType") {
                 return false;
             }
         }
+    }
+    // if rdfs:label is missing, consider it as not a valid RDFS class
+    if (!rdfsClass[labelProperty]) {
+        return false;
     }
     return true;
 }
@@ -129,9 +127,11 @@ function extractModelInternal(name, outCollection) {
 module.exports.generateOnlyModel = function(model, outDir) {
     let generator = new ModelGenerator();
     const logger = createLogger();
+    logger.debug(`Generating model for ${model.name}`);
     return generator.extractModel(model).then((source)=> {
         let sources = _.uniqBy(source, '@id').map((x)=> {
             return () => new Promise(((resolve1) => {
+                logger.debug(`Processing model "@id": ${x['@id']}`);
                 let modelPath = path.resolve(outDir, x.name.concat('.json'));
                 let isGenerated = false;
                 if (fs.existsSync(modelPath)) {
@@ -143,10 +143,11 @@ module.exports.generateOnlyModel = function(model, outDir) {
                             logger.debug(`Model "${x.name}" already exists. Skipping model creation`);
                             return resolve1();
                         } else {
-                            logger.info(`Model "${x.name}" is generated using @themost/cli. Overwriting existing model`);
+                            logger.debug(`Model "${x.name}" is generated using @themost/cli. Overwriting existing model`);
                         }
                     }
                 }
+                logger.debug(`Model "@id": ${x['@id']} has been successfully processed.`);
                 return resolve1(x);
             }));
         });
@@ -228,6 +229,7 @@ class ModelGenerator {
      * 
      */
     getList() {
+        const self = this;
         return this.loader.getSchema().then((schema)=> {
             let definitions = _.filter(schema[graphProperty], function(x) {
                 return x[typeProperty] === "rdfs:Class";
@@ -242,15 +244,28 @@ class ModelGenerator {
                     });
                 }
                 const res = {
-                    "name": x[labelProperty],
+                    "name": self._getStringFromRdf(x[labelProperty]),
                     "description": description
                 }
                 if (subClassOfDefinition) {
-                    res.subClassOf = subClassOfDefinition[labelProperty]
+                    res.subClassOf = self._getStringFromRdf(subClassOfDefinition[labelProperty])
                 }
                 return res;
             }));
         });
+    }
+    
+    _getStringFromRdf(rdfLabel) {
+        let labelString;
+        if (rdfLabel == null) {
+            return null;
+        }
+        if (Object.prototype.hasOwnProperty.call(rdfLabel, '@value')) {
+            labelString = rdfLabel['@value'];
+        } else if (typeof rdfLabel === 'string') {
+            labelString = rdfLabel;
+        }
+        return labelString;
     }
 
     /**
@@ -258,10 +273,8 @@ class ModelGenerator {
      */
     getModel(name)
     {
-
+        const self = this;
         return this.loader.getSchema().then((schema)=> {
-
-
             let definition = _.find(schema[graphProperty], function(x) {
                 return x[typeProperty] === "rdfs:Class" && x[labelProperty] === name;
             });
@@ -318,8 +331,8 @@ class ModelGenerator {
                     }
                     let res  = {
                         "@id": x[idProperty],
-                        "name":x[labelProperty],
-                        "title":x[labelProperty],
+                        "name": self._getStringFromRdf(x[labelProperty]),
+                        "title": self._getStringFromRdf(x[labelProperty]),
                         "description":comment
                     };
                     let type, rangeIncludes;
@@ -360,7 +373,7 @@ class ModelGenerator {
             };
 
             //check if super class is Enumeration
-            if (subClassOfDefinition && subClassOfDefinition[idProperty] === 'http://schema.org/Enumeration') {
+            if (subClassOfDefinition && subClassOfDefinition[idProperty] === 'schema:Enumeration') {
                 //find all enumeration members
                 let seedMembers = _.map(_.filter(schema[graphProperty], function(y) {
                     return y["@type"] === finalDefinition[idProperty];
@@ -457,15 +470,15 @@ class ModelGenerator {
                                 item = {
                                     "@id": element.getAttribute('rdf:about'),
                                     "@type": "rdf:Property",
-                                    "http://schema.org/domainIncludes": []
+                                    "schema:domainIncludes": []
                                 };
                                 element.selectNodes('rdfs:domain').forEach((child)=> {
-                                    item["http://schema.org/domainIncludes"].push({
+                                    item["schema:domainIncludes"].push({
                                         "@id": child.getAttribute('rdf:resource')
                                     })
                                 });
                                 if (element.selectSingleNode('rdfs:range')) {
-                                    item["http://schema.org/rangeIncludes"]={
+                                    item["schema:rangeIncludes"]={
                                         "@id": element.selectSingleNode('rdfs:range').getAttribute('rdf:resource')
                                     };
                                 }
@@ -483,17 +496,17 @@ class ModelGenerator {
                                 item = {
                                     "@id": element.getAttribute('rdf:about'),
                                     "@type": "rdf:Property",
-                                    "http://schema.org/domainIncludes": []
+                                    "schema:domainIncludes": []
                                 };
                                 element.selectNodes('rdfs:domain').forEach((child)=> {
-                                    item["http://schema.org/domainIncludes"].push({
+                                    item["schema:domainIncludes"].push({
                                         "@id": child.getAttribute('rdf:resource')
                                     })
                                 });
                                 if (element.selectSingleNode('rdfs:range')) {
 
                                     rangeAttr = element.selectSingleNode('rdfs:range').getAttribute('rdf:resource');
-                                    item["http://schema.org/rangeIncludes"]={
+                                    item["schema:rangeIncludes"]={
                                         "@id": rangeAttr
                                     };
                                 }
@@ -524,7 +537,7 @@ class ModelGenerator {
                     output["@graph"].push({
                         "@id": "http://www.w3.org/2001/XMLSchema#string",
                         "@type": [
-                            "http://schema.org/DataType",
+                            "schema:DataType",
                             "rdfs:Class"
                         ],
                         "rdfs:comment": "Data type: String.",

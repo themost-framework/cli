@@ -1,32 +1,25 @@
 // MOST Web Framework Copyright (c) 2017-2022, THEMOST LP All rights reserved
 const ModelGenerator = require('../../modeler/modeler').ModelGenerator;
-const {getConfiguration, createLogger} = require('../../util');
-const path = require('path');
+const { createLogger} = require('../../util');
 const Table = require('easy-table');
-const _ = require('lodash');
+const { truncate } = require('lodash');
 
 module.exports.command = 'info <model>';
-module.exports.desc = 'Outputs model definition';
+module.exports.desc = 'Outputs model definition. This command is deprecated. Use inspect instead.';
 
 module.exports.builder = function builder(yargs) {
     return yargs;
 };
 
-
-
 module.exports.handler = function (argv) {
-    // get options
-    let options = getConfiguration();
     const logger = createLogger();
-    // get output directory
-    let outDir = path.resolve(process.cwd(), options.base, 'config/models/');
     const generator = new ModelGenerator();
 
     function getFieldsForPrint(fields) {
-        return _.map(fields, function(x) {
+        return fields.map(function(x) {
             return {
                 name: x.name,
-                description: _.truncate(x.description, {
+                description: truncate(x.description, {
                     length:32
                 }),
                 type: x.type
@@ -38,10 +31,11 @@ module.exports.handler = function (argv) {
         return generator.getModel(name).then( function(model) {
             if (model.implements) {
                 return getFields(generator, model.implements).then( function(implementedFields) {
-                    const res = _.forEach(implementedFields, function(x) {
+                    const res = implementedFields.map(function(x) {
                         if (x.from == null) {
                             x.from = model.implements;
                         }
+                        return x;
                     });
                     res.push.apply(res, getFieldsForPrint(model.fields));
                     return Promise.resolve(res);
@@ -49,10 +43,11 @@ module.exports.handler = function (argv) {
             } 
             else if (model.inherits) {
                 return getFields(generator, model.inherits).then( function(inheritedFields) {
-                    const res = _.forEach(inheritedFields, function(x) {
+                    const res = inheritedFields.map(function(x) {
                         if (x.from == null) {
                             x.from = model.inherits;
                         }
+                        return x;
                     });
                     res.push.apply(res, getFieldsForPrint(model.fields));
                     return Promise.resolve(res);
@@ -71,12 +66,14 @@ module.exports.handler = function (argv) {
                 return Promise.resolve();
             }
             // print model attributes
-            console.log('');
-            console.log('Properties');
-            console.log('--------------');
+            process.stdout.write('\n');
+            process.stdout.write('Properties\n');
+            process.stdout.write('---\n');
             const modelToPrint = {
                 name: model.name,
-                description: model.description
+                description: truncate(model.description, {
+                    length: 80
+                })
             };
             if (model.inherits) {
                 modelToPrint.inherits = model.inherits;
@@ -84,13 +81,13 @@ module.exports.handler = function (argv) {
             if (model.implements) {
                 modelToPrint.implements = model.implements;
             }
-            console.log(Table.print(modelToPrint));
+            process.stdout.write(Table.print(modelToPrint));
+            process.stdout.write('\n');
             return getFields(generator, argv.model).then(function(fields) {
                 // print model attributes
-                console.log('');
-                console.log('Fields');
-                console.log('--------------');
-                console.log(Table.print(fields));
+                process.stdout.write('Fields\n');
+                process.stdout.write('---\n');
+                process.stdout.write(Table.print(fields));
             });
         });
 }

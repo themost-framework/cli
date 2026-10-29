@@ -2,7 +2,8 @@
     "@context": {
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-        "xsd": "http://www.w3.org/2001/XMLSchema#"
+        "xsd": "http://www.w3.org/2001/XMLSchema#",
+        "schema": "https://schema.org/"
     },
     "@graph": [
         {
@@ -11,7 +12,7 @@
             "rdfs:comment": "Party",
             "rdfs:label": "Party",
             "rdfs:subClassOf": {
-                "@id": "http://schema.org/Thing"
+                "@id": "schema:Thing"
             }
         },
         {
@@ -38,7 +39,7 @@
             "rdfs:comment": "Accounts",
             "rdfs:label": "Account",
             "rdfs:subClassOf": {
-                "@id": "http://schema.org/Thing"
+                "@id": "schema:Thing"
             }
         },
         {
@@ -50,12 +51,12 @@
         {
             "@id": "https://themost.io/schemas/id",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": [{
-                "@id": "http://schema.org/Thing"
+            "schema:domainIncludes": [{
+                "@id": "schema:Thing"
             },{
                 "@id": "https://themost.io/schemas/Permission"
             }],
-            "http://schema.org/rangeIncludes": {
+            "schema:rangeIncludes": {
                 "@id": "https://themost.io/schemas/Counter"
             },
             "rdfs:comment": "The identifier of the item.",
@@ -64,11 +65,11 @@
         {
             "@id": "https://themost.io/schemas/lockoutTime",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": {
+            "schema:domainIncludes": {
                 "@id": "https://themost.io/schemas/User"
             },
-            "http://schema.org/rangeIncludes": {
-                "@id": "http://schema.org/DateTime"
+            "schema:rangeIncludes": {
+                "@id": "schema:DateTime"
             },
             "rdfs:comment": "The date and time that this account was locked out.",
             "rdfs:label": "lockoutTime"
@@ -76,11 +77,11 @@
         {
             "@id": "https://themost.io/schemas/logonCount",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": {
+            "schema:domainIncludes": {
                 "@id": "https://themost.io/schemas/User"
             },
-            "http://schema.org/rangeIncludes": {
-                "@id": "http://schema.org/DateTime"
+            "schema:rangeIncludes": {
+                "@id": "schema:DateTime"
             },
             "rdfs:comment": "The number of times the account has successfully logged on.",
             "rdfs:label": "logonCount"
@@ -88,11 +89,11 @@
         {
             "@id": "https://themost.io/schemas/enabled",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": {
+            "schema:domainIncludes": {
                 "@id": "https://themost.io/schemas/User"
             },
-            "http://schema.org/rangeIncludes": {
-                "@id": "http://schema.org/Boolean"
+            "schema:rangeIncludes": {
+                "@id": "schema:Boolean"
             },
             "rdfs:comment": "Indicates whether a user is enabled or not.",
             "rdfs:label": "enabled"
@@ -100,11 +101,11 @@
         {
             "@id": "https://themost.io/schemas/lastLogon",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": {
+            "schema:domainIncludes": {
                 "@id": "https://themost.io/schemas/User"
             },
-            "http://schema.org/rangeIncludes": {
-                "@id": "http://schema.org/DateTime"
+            "schema:rangeIncludes": {
+                "@id": "schema:DateTime"
             },
             "rdfs:comment": "The last time and date the user logged on.",
             "rdfs:label": "lastLogon"
@@ -112,10 +113,10 @@
         {
             "@id": "https://themost.io/schemas/groups",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": {
+            "schema:domainIncludes": {
                 "@id": "https://themost.io/schemas/User"
             },
-            "http://schema.org/rangeIncludes": {
+            "schema:rangeIncludes": {
                 "@id": "https://themost.io/schemas/Group"
             },
             "rdfs:comment": "A collection of groups where user belongs.",
@@ -124,11 +125,11 @@
         {
             "@id": "https://themost.io/schemas/userFlags",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": {
+            "schema:domainIncludes": {
                 "@id": "https://themost.io/schemas/User"
             },
-            "http://schema.org/rangeIncludes": {
-                "@id": "http://schema.org/Integer"
+            "schema:rangeIncludes": {
+                "@id": "schema:Integer"
             },
             "rdfs:comment": "This field contains additional user flags.",
             "rdfs:label": "userFlags"
@@ -136,10 +137,10 @@
         {
             "@id": "https://themost.io/schemas/members",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": {
+            "schema:domainIncludes": {
                 "@id": "https://themost.io/schemas/Group"
             },
-            "http://schema.org/rangeIncludes": {
+            "schema:rangeIncludes": {
                 "@id": "https://themost.io/schemas/Account"
             },
             "rdfs:comment": "Contains the collection of group members (users or groups).",
@@ -148,13 +149,13 @@
         {
             "@id": "https://themost.io/schemas/dateCreated",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": [{
-                "@id": "http://schema.org/Thing"
+            "schema:domainIncludes": [{
+                "@id": "schema:Thing"
             },{
                 "@id": "https://themost.io/schemas/Permission"
             }],
-            "http://schema.org/rangeIncludes": {
-                "@id": "http://schema.org/DateTime"
+            "schema:rangeIncludes": {
+                "@id": "schema:DateTime"
             },
             "rdfs:comment": "The date on which this item was created.",
             "rdfs:label": "dateCreated"
@@ -162,13 +163,13 @@
         {
             "@id": "https://themost.io/schemas/dateModified",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": [{
-                "@id": "http://schema.org/Thing"
+            "schema:domainIncludes": [{
+                "@id": "schema:Thing"
             },{
                 "@id": "https://themost.io/schemas/Permission"
             }],
-            "http://schema.org/rangeIncludes": {
-                "@id": "http://schema.org/DateTime"
+            "schema:rangeIncludes": {
+                "@id": "schema:DateTime"
             },
             "rdfs:comment": "The date on which this item was most recently modified.",
             "rdfs:label": "dateModified"
@@ -176,26 +177,26 @@
         {
             "@id": "https://themost.io/schemas/createdBy",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": [{
-                "@id": "http://schema.org/Thing"
+            "schema:domainIncludes": [{
+                "@id": "schema:Thing"
             },{
                 "@id": "https://themost.io/schemas/Permission"
             }],
-            "http://schema.org/rangeIncludes": {
-                "@id": "http://schema.org/Integer"
+            "schema:rangeIncludes": {
+                "@id": "schema:Integer"
             },
             "rdfs:comment": "Created by user.",
             "rdfs:label": "createdBy"
         },{
             "@id": "https://themost.io/schemas/modifiedBy",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": [{
-                "@id": "http://schema.org/Thing"
+            "schema:domainIncludes": [{
+                "@id": "schema:Thing"
             },{
                 "@id": "https://themost.io/schemas/Permission"
             }],
-            "http://schema.org/rangeIncludes": {
-                "@id": "http://schema.org/Integer"
+            "schema:rangeIncludes": {
+                "@id": "schema:Integer"
             },
             "rdfs:comment": "Last modified by user.",
             "rdfs:label": "modifiedBy"
@@ -203,7 +204,7 @@
         {
             "@id": "https://themost.io/schemas/Counter",
             "@type": [
-                "http://schema.org/DataType",
+                "schema:DataType",
                 "rdfs:Class"
             ],
             "rdfs:comment": "Data type: Counter.",
@@ -212,11 +213,11 @@
         {
             "@id": "https://themost.io/schemas/privilege",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": {
+            "schema:domainIncludes": {
                 "@id": "https://themost.io/schemas/Permission"
             },
-            "http://schema.org/rangeIncludes": {
-                "@id": "http://schema.org/Text"
+            "schema:rangeIncludes": {
+                "@id": "schema:Text"
             },
             "rdfs:comment": "The privilege where this permission refers",
             "rdfs:label": "privilege"
@@ -224,11 +225,11 @@
         {
             "@id": "https://themost.io/schemas/parentPrivilege",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": {
+            "schema:domainIncludes": {
                 "@id": "https://themost.io/schemas/Permission"
             },
-            "http://schema.org/rangeIncludes": {
-                "@id": "http://schema.org/Text"
+            "schema:rangeIncludes": {
+                "@id": "schema:Text"
             },
             "rdfs:comment": "The parent privilege of this permission",
             "rdfs:label": "parentPrivilege"
@@ -236,11 +237,11 @@
         {
             "@id": "https://themost.io/schemas/account",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": {
+            "schema:domainIncludes": {
                 "@id": "https://themost.io/schemas/Permission"
             },
-            "http://schema.org/rangeIncludes": {
-                "@id": "http://schema.org/Account"
+            "schema:rangeIncludes": {
+                "@id": "schema:Account"
             },
             "rdfs:comment": "The account which is related with this permission.",
             "rdfs:label": "account"
@@ -248,11 +249,11 @@
         {
             "@id": "https://themost.io/schemas/target",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": {
+            "schema:domainIncludes": {
                 "@id": "https://themost.io/schemas/Permission"
             },
-            "http://schema.org/rangeIncludes": {
-                "@id": "http://schema.org/Integer"
+            "schema:rangeIncludes": {
+                "@id": "schema:Integer"
             },
             "rdfs:comment": "The target object.",
             "rdfs:label": "target"
@@ -260,11 +261,11 @@
         {
             "@id": "https://themost.io/schemas/mask",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": {
+            "schema:domainIncludes": {
                 "@id": "https://themost.io/schemas/Permission"
             },
-            "http://schema.org/rangeIncludes": {
-                "@id": "http://schema.org/Integer"
+            "schema:rangeIncludes": {
+                "@id": "schema:Integer"
             },
             "rdfs:comment": "The permission mask.",
             "rdfs:label": "mask"
@@ -272,11 +273,11 @@
         {
             "@id": "https://themost.io/schemas/official",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": {
-                "@id": "http://schema.org/Country"
+            "schema:domainIncludes": {
+                "@id": "schema:Country"
             },
-            "http://schema.org/rangeIncludes": {
-                "@id": "http://schema.org/Text"
+            "schema:rangeIncludes": {
+                "@id": "schema:Text"
             },
             "rdfs:comment": "The official name of a country.",
             "rdfs:label": "official"
@@ -284,11 +285,11 @@
         {
             "@id": "https://themost.io/schemas/cca2",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": {
-                "@id": "http://schema.org/Country"
+            "schema:domainIncludes": {
+                "@id": "schema:Country"
             },
-            "http://schema.org/rangeIncludes": {
-                "@id": "http://schema.org/Text"
+            "schema:rangeIncludes": {
+                "@id": "schema:Text"
             },
             "rdfs:comment": "The ISO 3166-1 alpha-2 code of a country.",
             "rdfs:label": "cca2"
@@ -296,11 +297,11 @@
         {
             "@id": "https://themost.io/schemas/cca3",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": {
-                "@id": "http://schema.org/Country"
+            "schema:domainIncludes": {
+                "@id": "schema:Country"
             },
-            "http://schema.org/rangeIncludes": {
-                "@id": "http://schema.org/Text"
+            "schema:rangeIncludes": {
+                "@id": "schema:Text"
             },
             "rdfs:comment": "The ISO 3166-1 alpha-3 code of a country.",
             "rdfs:label": "cca3"
@@ -308,11 +309,11 @@
         {
             "@id": "https://themost.io/schemas/cioc",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": {
-                "@id": "http://schema.org/Country"
+            "schema:domainIncludes": {
+                "@id": "schema:Country"
             },
-            "http://schema.org/rangeIncludes": {
-                "@id": "http://schema.org/Text"
+            "schema:rangeIncludes": {
+                "@id": "schema:Text"
             },
             "rdfs:comment": "The International Olympic Committee code of a country.",
             "rdfs:label": "cioc"
@@ -320,11 +321,11 @@
         {
             "@id": "https://themost.io/schemas/currency",
             "@type": "rdf:Property",
-            "http://schema.org/domainIncludes": {
-                "@id": "http://schema.org/Country"
+            "schema:domainIncludes": {
+                "@id": "schema:Country"
             },
-            "http://schema.org/rangeIncludes": {
-                "@id": "http://schema.org/Text"
+            "schema:rangeIncludes": {
+                "@id": "schema:Text"
             },
             "rdfs:comment": "The currency of a country.",
             "rdfs:label": "currency"
@@ -335,7 +336,7 @@
             "rdfs:comment": "Regions",
             "rdfs:label": "Region",
             "rdfs:subClassOf": {
-                "@id": "http://schema.org/AdministrativeArea"
+                "@id": "schema:AdministrativeArea"
             }
         }
     ],

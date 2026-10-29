@@ -25,6 +25,7 @@ if (isInteractive(args)) {
             type: 'boolean',
             describe: 'starts an interactive shell for executing commands against the same application instance'
         })
+        .showHelpOnFail(false) 
         .demandCommand()
         .help()
         .exitProcess(false);

@@ -39,7 +39,15 @@ module.exports.thingModelFormatter = function(model) {
            "abstract": true,
            "hidden": true
         });
-        Utils.findAttribute(model, 'id').primary = true;
+        model.fields = model.fields || [];
+        model.fields.unshift({
+            "@id": "https://themost.io/schemas/id",
+            "name": "id",
+            "title": "id",
+            "description": "The identifier of the item.",
+            "type": "Counter",
+            "primary": true
+        });
         Utils.removeAttribute(model, 'potentialAction');
         Utils.assignToAttribute(model, 'identifier', {
             "type":"Text"

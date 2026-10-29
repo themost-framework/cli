@@ -27,6 +27,12 @@ module.exports.handler = function (argv) {
         () => generateOnlyModel('Permission', outDir)
     ];
     return Promise.sequence(sources).then((results)=> {
+        // validate results
+        const expected = results.find((r) => r && r.name === argv.model);
+        if (!expected) {
+            logger.error(`Model "${argv.model}" could not be found`);
+            return Promise.resolve();
+        }
         // results is an array of model objects returned by generateOnlyModel
         const models = results.reduce((acc, val) => {
             return acc.concat(val);
