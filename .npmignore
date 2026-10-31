@@ -11,8 +11,9 @@ node_modules
 # tests
 spec
 
-# elsint
+# eslint
 .eslintrc
+.eslintignore
 
 # docs
 docs
