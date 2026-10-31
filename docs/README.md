@@ -8,7 +8,7 @@ readingTime: 3 min
 
 # MOST Web Framework CLI Documentation
 
-`@themost/cli` (binary name `themost`) is the command line utility of the MOST Web Framework. It creates new projects, generates models, classes, listeners, controllers and services, extracts schema.org based data models, queries and imports data and builds projects.
+`@themost/cli` (binary name `themost`) is the command line utility of the MOST Web Framework. It creates new projects, generates models, classes, listeners, controllers and services, extracts schema.org based data models and queries and imports data.
 
 This documentation describes version 2.12.0, which uses `yargs@17` for command parsing.
 
@@ -47,9 +47,8 @@ npm run cli -- modeler ls
 | `import <file>` | Imports data from a JSON file | Data Commands |
 | `cat [model]` | Queries a data model and prints or saves the result | Data Commands |
 | `random <type>` | Prints a random integer, string, hex string or guid | Data Commands |
-| `build` | Builds the current project | Building Projects |
 
-Running `themost` with no arguments starts the interactive shell (see Data Commands).
+Running `npx @themost/cli` with no arguments starts the interactive shell (see Data Commands).
 
 ## Articles
 
@@ -58,7 +57,7 @@ Running `themost` with no arguments starts the interactive shell (see Data Comma
 3. [Generating Components](generate.md) - every `generate` subcommand.
 4. [Working with the Modeler](modeler.md) - the `modeler` subcommands.
 5. [Data Commands](data-commands.md) - `import`, `cat`, `random` and the interactive shell.
-6. [Building Projects](build-and-serve.md) - the `build` command and what the CLI does not provide.
+6. [Building and Running Projects](build-and-serve.md) - the npm scripts which build and run a project.
 
 ## Summary
 

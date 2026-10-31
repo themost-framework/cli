@@ -15,7 +15,7 @@ Both commands accept `--configuration` (`-c`), with the choices `development` an
 ## import
 
 ```
-themost import <file> --model <model> [--configuration <development|production>]
+npx @themost/cli import <file> --model <model> [--configuration <development|production>]
 ```
 
 | Name | Type | Default | Description |
@@ -41,7 +41,7 @@ Example, with `data/groups.json`:
 ```
 
 ```sh
-themost import data/groups.json --model Group
+npx @themost/cli import data/groups.json --model Group
 ```
 
 Expected effect: two groups are inserted (or updated if the model can match them to existing rows) and the log ends with `The operation was completed successfully`.
@@ -49,7 +49,7 @@ Expected effect: two groups are inserted (or updated if the model can match them
 ## cat
 
 ```
-themost cat [model] [--model <model>] [query options] [--out <file>] [--state <state>] [-c <configuration>]
+npx @themost/cli cat [model] [--model <model>] [query options] [--out <file>] [--state <state>] [-c <configuration>]
 ```
 
 `model` may be given as a positional argument or with `--model`. If both are missing the command fails with `The target cannot be empty`.
@@ -73,16 +73,16 @@ Options with an empty value (`null`, `0` or `false`) are not sent to the query. 
 Examples:
 
 ```sh
-themost cat User --filter "enabled eq true" --select id,name --top 10
-themost cat Group --order name --count true
-themost cat User --top 1
+npx @themost/cli cat User --filter "enabled eq true" --select id,name --top 10
+npx @themost/cli cat Group --order name --count true
+npx @themost/cli cat User --top 1
 ```
 
 Export and re-import data, for example between environments:
 
 ```sh
-themost cat Group --top 1000 --state insert --out data/groups.json
-themost import data/groups.json --model Group -c production
+npx @themost/cli cat Group --top 1000 --state insert --out data/groups.json
+npx @themost/cli import data/groups.json --model Group -c production
 ```
 
 Note that `--state update` or `--state insert` is only a marker for `import`; `import` honors `$state` values over inference.
@@ -90,7 +90,7 @@ Note that `--state update` or `--state insert` is only a marker for `import`; `i
 ## random
 
 ```
-themost random [type] [--min <n>] [--max <n>] [--length <n>]
+npx @themost/cli random [type] [--min <n>] [--max <n>] [--length <n>]
 ```
 
 `type` is an optional positional argument.
@@ -110,9 +110,9 @@ themost random [type] [--min <n>] [--max <n>] [--length <n>]
 | `guid` | An RFC 4122 version 4 style identifier |
 
 ```sh
-themost random guid
-themost random hex --length 48
-themost random int --min 100 --max 200
+npx @themost/cli random guid
+npx @themost/cli random hex --length 48
+npx @themost/cli random int --min 100 --max 200
 ```
 
 The `hex` form is handy for the application secret in `server/config/app.json`, since it uses `crypto.randomBytes`. The `int`, `string` and `guid` values come from `Math.random()` and are not cryptographically secure. The last example prints a number from 100 to 200.
@@ -120,12 +120,12 @@ The `hex` form is handy for the application secret in `server/config/app.json`, 
 ## Interactive shell
 
 ```
-themost            # no arguments
-themost -i
-themost cat User --top 1 -i
+npx @themost/cli   # no arguments
+npx @themost/cli -i
+npx @themost/cli cat User --top 1 -i
 ```
 
-Running `themost` without arguments, or with `--interactive` / `-i`, starts a shell with the prompt `@themost> `. The shared application instance is created once, so repeated `cat` and `import` commands do not reload it. A command given together with `-i` runs first.
+Running `npx @themost/cli` without arguments, or with `--interactive` / `-i`, starts a shell with the prompt `@themost> `. The shared application instance is created once, so repeated `cat` and `import` commands do not reload it. A command given together with `-i` runs first.
 
 Inside the shell:
 

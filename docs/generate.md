@@ -9,7 +9,7 @@ readingTime: 9 min
 # Generating Components
 
 ```
-themost generate <command> <name> [options]
+npx @themost/cli generate <command> <name> [options]
 ```
 
 All generators read `.themost-cli.json` (see Configuring the CLI), write below the `base` folder (default `server`) and emit TypeScript (`.ts`) instead of JavaScript (`.js`) when `mode` is `typescript`. Run them from the project root.
@@ -28,7 +28,7 @@ Existing files are never overwritten by `model`, `controller`, `listener` and `s
 ## generate model
 
 ```
-themost generate model <name> [--inherits <model>] [--implements <model>]
+npx @themost/cli generate model <name> [--inherits <model>] [--implements <model>]
 ```
 
 | Name | Type | Default | Description |
@@ -42,8 +42,8 @@ The definition is rendered from `templates/generate/model.json.ejs`: `@id` is `h
 The `config/models` folder is created if it does not exist.
 
 ```sh
-themost generate model Article
-themost generate model BlogPost --inherits Article
+npx @themost/cli generate model Article
+npx @themost/cli generate model BlogPost --inherits Article
 ```
 
 Expected result: `server/config/models/Article.json` and `server/config/models/BlogPost.json` (with `"inherits": "Article"` and no fields).
@@ -51,7 +51,7 @@ Expected result: `server/config/models/Article.json` and `server/config/models/B
 ## generate class
 
 ```
-themost generate class <name> [--silent] [--force]
+npx @themost/cli generate class <name> [--silent] [--force]
 ```
 
 | Name | Type | Default | Description |
@@ -69,57 +69,57 @@ How it works:
 - After the class, the handler also runs the `classdef` generator for the same name (`generate class` therefore also writes `<name>.d.ts`).
 
 ```sh
-themost generate class User
-themost generate class User+Group --force
-themost generate class app
+npx @themost/cli generate class User
+npx @themost/cli generate class User+Group --force
+npx @themost/cli generate class app
 ```
 
 ## generate classdef
 
 ```
-themost generate classdef <name> [--silent] [--force]
+npx @themost/cli generate classdef <name> [--silent] [--force]
 ```
 
 Same options and name rules as `generate class` (here both options are untyped in the declaration; the defaults are `false`). It writes `<base>/models/<name>.d.ts`, a TypeScript declaration of the model class using `any` for unknown types. The declaration lists the fields declared by the model itself (`attribute.model === name`) and marks nullable fields as optional. Referenced models get their declarations generated too, unless a file already exists.
 
 ```sh
-themost generate classdef Article
+npx @themost/cli generate classdef Article
 ```
 
 ## generate controller
 
 ```
-themost generate controller <name>
+npx @themost/cli generate controller <name>
 ```
 
 `name` is positional and required. A trailing `Controller` is removed from `name` and then appended again, so `Home` and `HomeController` both produce `class HomeController` in `<base>/controllers/HomeController.js|ts`. The template extends `HttpBaseController` from `@themost/web` and defines a `getIndex()` action decorated with `@httpGet()` and `@httpAction('index')`.
 
 ```sh
-themost generate controller Home
+npx @themost/cli generate controller Home
 ```
 
 ## generate listener
 
 ```
-themost generate listener <name>
+npx @themost/cli generate listener <name>
 ```
 
 The file is `<base>/listeners/<name>.js|ts`. The JavaScript template exports `beforeSave` and `afterSave` functions with the `(event, callback)` signature. Register the listener in the `eventListeners` of a model definition yourself, the command does not modify models. The command logs the destination with `debug` and `info` levels of the logger.
 
 ```sh
-themost generate listener OnArticleSave
+npx @themost/cli generate listener OnArticleSave
 ```
 
 ## generate service
 
 ```
-themost generate service <name>
+npx @themost/cli generate service <name>
 ```
 
 The file is `<base>/services/<name>.js|ts`. The template declares `class <name>Service extends ApplicationService` (from `@themost/common`), so `generate service Mailer` creates `Mailer.js` containing `MailerService`. Register it in your application with `useService`.
 
 ```sh
-themost generate service Mailer
+npx @themost/cli generate service Mailer
 ```
 
 ## Summary

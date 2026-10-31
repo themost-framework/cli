@@ -14,17 +14,17 @@ This article shows how to install `@themost/cli`, create a new project and run i
 
 ```sh
 npm i -g @themost/cli
-themost --help
+npx @themost/cli --help
 ```
 
-You can also skip the installation and use `npx @themost/cli ...`. The examples below use the `themost` binary.
+The examples below use `npx @themost/cli`, which runs the locally or globally installed CLI, or downloads it when it is not installed. With a global installation you can also type `themost` instead.
 
 ## Create a project
 
 ### Synopsis
 
 ```
-themost new project <directory> [--template <api|express>] [--typescript] [--skip-install]
+npx @themost/cli new project <directory> [--template <api|express>] [--typescript] [--skip-install]
 ```
 
 ### Arguments and options
@@ -47,7 +47,7 @@ themost new project <directory> [--template <api|express>] [--typescript] [--ski
 ### Example
 
 ```sh
-themost new project my-app --template api
+npx @themost/cli new project my-app --template api
 cd my-app
 ```
 
@@ -56,7 +56,7 @@ The dependencies are installed by the command. Use `--skip-install` to install t
 Create a TypeScript project using the express template:
 
 ```sh
-themost new project my-app --template express --typescript
+npx @themost/cli new project my-app --template express --typescript
 ```
 
 ## Project layout
@@ -122,4 +122,4 @@ Commands which load the application (`cat`, `import`, `modeler extract`) use the
 
 ## Summary
 
-`themost new project` copies a template, generates fresh secrets and installs the dependencies (unless `--skip-install` is set). It does not build the project, so run `npm run build` next. Next, read Configuring the CLI and Generating Components.
+`npx @themost/cli new project` copies a template, generates fresh secrets and installs the dependencies (unless `--skip-install` is set). It does not build the project, so run `npm run build` next. Next, read Configuring the CLI and Generating Components.

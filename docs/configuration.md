@@ -37,7 +37,7 @@ The JavaScript templates (`api` and `express`) generate exactly this content. Th
 |--------|------|---------|---------|
 | `base` | string | `server` | The source folder. Generators write into it (`models`, `controllers`, `listeners`, `services`, `config/models`). `generate class` and `generate classdef` also read the data configuration from `<base>/config`, and `modeler extract` writes into `<base>/config/models` |
 | `out` | string | `dist/server` | The compiled output folder. `cat`, `import` and `modeler extract` create the application from `<out>/config` |
-| `mode` | string | not set | When it equals `typescript`, generators emit `.ts` files and `build` uses the TypeScript build module. Any other value, or no value, means JavaScript |
+| `mode` | string | not set | When it equals `typescript`, generators emit `.ts` files. Any other value, or no value, means JavaScript |
 | `application` | string | not set | A custom application factory, see below |
 
 Paths are resolved against the current working directory.
@@ -76,4 +76,4 @@ Commands that never read the file are `random`, `modeler ls`, `modeler inspect`,
 
 ## Summary
 
-Keep `.themost-cli.json` at the project root. `base` is where you edit sources, `out` is the compiled project the application commands run against and `mode` switches generators and `build` to TypeScript.
+Keep `.themost-cli.json` at the project root. `base` is where you edit sources, `out` is the compiled project the application commands run against and `mode` switches generators to TypeScript.
