@@ -43,11 +43,12 @@ so the application instance is loaded once and shared across commands
 
 Each line accepts a command with its options e.g.
 
-    themost> cat User --filter "name eq 'admin'" --select id,name --top 1
-    themost> import data/users.json --model User
+    @themost> cat User --filter "name eq 'admin'" --select id,name --top 1
+    @themost> import data/users.json --model User
 
 A command passed together with `-i` is executed before prompting e.g. `npx @themost/cli cat User --top 1 -i`.
-Use `help` to print the available commands, `help <command>` for command options and `exit` (or `.exit`) to quit.
+Use `help` to print the available commands, `help <command>` for command options and `exit` (or `quit`, `.exit`) to quit.
+Command history is kept in `~/.themost_history`.
 
 ### User modeler
 

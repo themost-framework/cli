@@ -201,18 +201,20 @@ function createApplication(options) {
     if (options.application) {
         // try to create application from custom module
         let [customModule, className] = options.application.split('#');
+        if (customModule.startsWith('.')) {
+            customModule = path.resolve(process.cwd(), customModule);
+        }
         if (className) {
-            if (customModule.startsWith('.')) {
-                customModule = path.resolve(process.cwd(), customModule);
-            }
             ApplicationClassOrFunction = require(customModule)[className];
             // create a new instance of application passing the output directory as the current path
             return new ApplicationClassOrFunction(path.resolve(process.cwd(), options.out));
         }
-        if (typeof customModule !== 'function') {
+        // the module itself exports a function which returns the application
+        const applicationFactory = require(customModule);
+        if (typeof applicationFactory !== 'function') {
             throw new Error(`Invalid application module. The module ${options.application} does not export a function.`);
         }
-        return customModule(path.resolve(process.cwd(), options.out));
+        return applicationFactory(path.resolve(process.cwd(), options.out));
     }
     try {
         // eslint-disable-next-line node/no-missing-require

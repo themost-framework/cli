@@ -1,12 +1,13 @@
 // MOST Web Framework Copyright (c) 2017-2022, THEMOST LP All rights reserved
-module.exports.command = 'random <type> [options]';
+const crypto = require('crypto');
+module.exports.command = 'random [type] [options]';
 
 module.exports.desc = 'Create a new random string, integer or guid';
 
 
 module.exports.builder = function builder(yargs) {
-    return yargs.option('type', {
-        alias:'t',
+    return yargs.positional('type', {
+        describe: 'the type of the random value',
         choices: ['int', 'string', 'guid', 'hex'],
         default:'int'
     }).option('min', {
@@ -38,8 +39,14 @@ const UUID_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwx
 
 class RandomCommand {
 
+    /**
+     * Returns a random integer between min and max (inclusive)
+     * @param {number} min
+     * @param {number} max
+     * @return {number}
+     */
     static randomInt(min, max) {
-        return Math.floor(Math.random()*max) + min;
+        return Math.floor(Math.random()*(max - min + 1)) + min;
     }
 
     /**
@@ -49,7 +56,7 @@ class RandomCommand {
      */
     static randomHex(length) {
         length = length || 16;
-        return new Buffer(RandomCommand.randomString(length)).toString('hex');
+        return crypto.randomBytes(Math.ceil(length / 2)).toString('hex').substring(0, length);
     }
 
     /**

@@ -37,6 +37,7 @@ module.exports.handler = function handler(argv) {
             // clear fields
             model.fields.splice(0, model.fields.length);
         }
+        fs.ensureDirSync(path.dirname(destPath));
         fs.writeFileSync(destPath, JSON.stringify(model, null, 4));
         return Promise.resolve();
     }).then(() => {

@@ -32,10 +32,8 @@ module.exports.handler = function handler(argv) {
         console.error('ERROR','The target cannot be empty');
         return process.exit(1);
     }
-    if (argv.configuration === 'development') {
-        //set development mode
-        process.env.NODE_ENV='development';
-    }
+    // set NODE_ENV based on the given configuration
+    process.env.NODE_ENV = argv.configuration;
     Object.assign(options, {
         configuration: argv.configuration
     });

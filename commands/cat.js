@@ -89,7 +89,7 @@ function queryModel(context, argv) {
                 }
                 let finalResult = (argv.top === 1 && !argv.count) ? res[0] : res;
                 if (argv.state !== 'none') {
-                    let state = argv.state === 'insert' ? 1 : argv.state === 'new' ? 1 :  argv.state === 'update' ? 2 : argv.state === 'delete' ? 4 : 0;
+                    let state = argv.state === 'insert' ? 1 : argv.state === 'update' ? 2 : argv.state === 'delete' ? 4 : 0;
                     if (state>0) {
                         if (Array.isArray(finalResult)) {
                             finalResult.forEach( x=> {
@@ -166,10 +166,8 @@ module.exports.handler = function handler(argv) {
     if ((typeof argv.model === 'undefined' || argv.model === null)) {
         return Promise.reject(new Error('The target cannot be empty'));
     }
-    if (argv.configuration === 'development') {
-        //set development mode
-        process.env.NODE_ENV='development';
-    }
+    // set NODE_ENV based on the given configuration
+    process.env.NODE_ENV = argv.configuration;
     Object.assign(options, {
         configuration: argv.configuration
     });

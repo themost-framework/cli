@@ -13,8 +13,8 @@ module.exports.builder = {
 module.exports.handler = function (argv) {
     const options = getConfiguration();
     const logger = createLogger();
-     //get controller name
-    const controllerName = argv.name;
+    //get controller name e.g. Home or HomeController => HomeController
+    const controllerName = argv.name.replace(/Controller$/i,'').concat('Controller');
     //get controller file name
     const controllerFile = controllerName.concat(options.mode==='typescript' ? '.ts': '.js');
     const controllerPath = path.resolve(process.cwd(), options.base, `controllers/${controllerFile}`);
@@ -34,7 +34,7 @@ module.exports.handler = function (argv) {
        return writeFileFromTemplate(templateFile, controllerPath, {
             name:controllerName.replace(/Controller$/i,'')
         }).then(() => {
-           logger.log('INFO', `The controller "${argv.name}" generated successfully at ${path.relative(process.cwd(), controllerPath)}`);
+           logger.info(`The controller "${argv.name}" generated successfully at ${path.relative(process.cwd(), controllerPath)}`);
            return Promise.resolve();
        }).catch((err)=> {
            logger.error('An error occurred while generating controller.');

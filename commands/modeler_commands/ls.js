@@ -24,7 +24,14 @@ module.exports.handler = function (argv) {
             return x;
         });
         if (argv.model) {
-            const re = new RegExp(argv.model, 'ig');
+            // avoid global flag which keeps state between test() calls
+            let re;
+            try {
+                re = new RegExp(String(argv.model), 'i');
+            } catch (err) {
+                // an invalid regular expression is treated as plain text
+                re = new RegExp(String(argv.model).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+            }
             const finalRes = res.filter(function(x) {
                 return re.test(x.name) || re.test(x.subClassOf);
             });

@@ -1,6 +1,7 @@
 // MOST Web Framework Copyright (c) 2017-2022, THEMOST LP All rights reserved
 const path = require('path');
 const crypto = require('crypto');
+const { spawn } = require('child_process');
 const { createLogger } = require('../../util');
 const existsSync = require('fs-extra').existsSync;
 const readdirSync = require('fs-extra').readdirSync;
@@ -30,7 +31,7 @@ module.exports.builder = function builder(yargs) {
 
 /**
  *
- * @param {{template: string, typescript: boolean, directory: string}} argv
+ * @param {{template: string, typescript: boolean, directory: string, skipInstall: boolean}} argv
  * @returns {*}
  */
 module.exports.handler = function handler(argv) {
@@ -55,7 +56,12 @@ module.exports.handler = function handler(argv) {
     return copy(templateRoot, projectRoot).then(() => {
             return Promise.all([
                 updateApplicationConfiguration(argv)
-                ]).then(()=> {
+                ]).then(() => {
+                    if (argv.skipInstall) {
+                        return Promise.resolve();
+                    }
+                    return installDependencies(projectRoot, logger);
+                }).then(()=> {
                     logger.log(`The operation was completed successfully. A new project was created at ${projectRoot}`);
                     return Promise.resolve();
                 }).catch((err) => {
@@ -68,6 +74,25 @@ module.exports.handler = function handler(argv) {
         });
 
 };
+
+function installDependencies(projectRoot, logger) {
+    return new Promise((resolve, reject) => {
+        logger.info('Installing dependencies');
+        const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+        const child = spawn(npm, ['install'], {
+            cwd: projectRoot,
+            stdio: 'inherit',
+            shell: process.platform === 'win32'
+        });
+        child.on('error', reject);
+        child.on('close', (code) => {
+            if (code !== 0) {
+                return reject(new Error(`npm install exited with code ${code}`));
+            }
+            return resolve();
+        });
+    });
+}
 
 function updateApplicationConfiguration(argv) {
     return new Promise((resolve, reject) => {

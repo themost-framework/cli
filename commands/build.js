@@ -1,5 +1,5 @@
 // MOST Web Framework Copyright (c) 2017-2022, THEMOST LP All rights reserved
-const getConfiguration = require('../util').getConfiguration;
+const {getConfiguration, createLogger} = require('../util');
 
 module.exports = {
     command: 'build',
@@ -7,27 +7,24 @@ module.exports = {
     builder: function builder(yargs) {
         return yargs;
     },
-    handler: function handler(argv) {
-        let options = getConfiguration();
-        let buildModule = '@themost-devkit/build';
+    handler: function handler() {
+        const options = getConfiguration();
+        const logger = createLogger();
+        const buildModule = options.mode === 'typescript' ? '@themost-devkit/build-typescript' : '@themost-devkit/build';
         let build;
-        if (options.mode === 'typescript') {
-            // load build module
-            buildModule = '@themost-devkit/build-typescript';
+        try {
             build = require(buildModule).build;
-            return build(process.cwd()).then( () => {
-                console.log('INFO', 'Build operation was completed successfully.');
-            }).catch(err => {
-                console.error(err);
-            });
-        } 
-        else {
-            build = require(buildModule).build;
-            return build(process.cwd()).then( () => {
-                console.log('INFO', 'Build operation was completed successfully.');
-            }).catch(err => {
-                console.error(err);
-            });
+        } catch (err) {
+            if (err.code === 'MODULE_NOT_FOUND') {
+                logger.error(`Build module ${buildModule} cannot be found. Install it with: npm i -D ${buildModule}`);
+            }
+            return Promise.reject(err);
         }
+        return build(process.cwd()).then(() => {
+            logger.info('Build operation was completed successfully.');
+        }).catch((err) => {
+            logger.error('An error occurred while building project.');
+            return Promise.reject(err);
+        });
     }
 };

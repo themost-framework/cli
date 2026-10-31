@@ -25,7 +25,7 @@ function formatJsonTypedAttribute(context, model) {
             if (fieldModel.inherits) {
                 const inheritedModel = context.model(fieldModel.inherits);
                 // if inherited model is a JSON typed model
-                if (JsonTypes.includes(inheritedModel.inherits)) {
+                if (inheritedModel && JsonTypes.includes(inheritedModel.inherits)) {
                     // push the current model to JSON types if not already included
                     // to follow the JSON typed inheritance chain
                     if (JsonTypes.includes(fieldModel.name) === false) {
