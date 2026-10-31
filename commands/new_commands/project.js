@@ -8,6 +8,7 @@ const readdirSync = require('fs-extra').readdirSync;
 const copy = require('fs-extra').copy;
 const readFile = require('fs-extra').readFile;
 const writeFile = require('fs-extra').writeFile;
+const semver = require('semver');
 
 module.exports.command = 'project <directory>';
 
@@ -57,10 +58,12 @@ module.exports.handler = function handler(argv) {
             return Promise.all([
                 updateApplicationConfiguration(argv)
                 ]).then(() => {
-                    if (argv.skipInstall) {
-                        return Promise.resolve();
-                    }
-                    return installDependencies(projectRoot, logger);
+                    return preInstallDependencies(projectRoot).then(() => {
+                        if (argv.skipInstall) {
+                            return Promise.resolve();
+                        }
+                        return installDependencies(projectRoot, logger);
+                    });
                 }).then(()=> {
                     logger.log(`The operation was completed successfully. A new project was created at ${projectRoot}`);
                     return Promise.resolve();
@@ -74,6 +77,47 @@ module.exports.handler = function handler(argv) {
         });
 
 };
+
+function preInstallDependencies(projectRoot) {
+    return new Promise((resolve, reject) => {
+        let packageJsonPath = path.resolve(projectRoot, 'package.json');
+        if (existsSync(packageJsonPath)) {
+            return readFile(packageJsonPath, 'utf8', (err, str) => {
+                if (err) {
+                    return reject(err);
+                }
+                // noinspection JSCheckFunctionSignatures
+                let data = JSON.parse(str);
+                if (!data.nodeEngineDependencies) {
+                    return resolve();
+                }
+                let nodeVersion = process.versions.node;
+                let nodeEngineDependencies = data.nodeEngineDependencies;
+                for (const [packageName, versionMap] of Object.entries(nodeEngineDependencies)) {
+                    let selectedVersion = null;
+                    // noinspection JSCheckFunctionSignatures
+                    for (const [versionRange, version] of Object.entries(versionMap)) {
+                        if (semver.satisfies(nodeVersion, versionRange)) {
+                            selectedVersion = version;
+                            break;
+                        }
+                    }
+                    if (selectedVersion) {
+                        data.dependencies[packageName] = selectedVersion;
+                    }
+                }
+                delete data.nodeEngineDependencies;
+                return writeFile(packageJsonPath, JSON.stringify(data, null, 4), 'utf8', (err) => {
+                    if (err) {
+                        return reject(err);
+                    }
+                    return resolve();
+                })
+            })
+        }
+        return resolve();
+    });
+}
 
 function installDependencies(projectRoot, logger) {
     return new Promise((resolve, reject) => {
@@ -131,6 +175,5 @@ function updateApplicationConfiguration(argv) {
                 });
             });
         }
-        return resolve();
     });
 }

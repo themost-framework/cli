@@ -14,6 +14,14 @@
   "engines": {
     "node": ">=22.0.0"
   },
+  "nodeEngineDependencies": {
+    "@themost/sqlite": {
+      "<20": "lts-2",
+      "20": "lts-20",
+      "=22": "lts-22",
+      ">22": "latest"
+    }
+  },
   "devDependencies": {
     "@themost/cli": "^2",
     "@types/express": "^5.0.6",
